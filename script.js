@@ -253,8 +253,7 @@ function updateGreeting(hour) {
     greetingElement.textContent = userName ? `${greeting}, ${userName}` : greeting;
     
     const iconElement = document.getElementById('greeting-icon');
-    // Greeting icon is controlled by weather; do not overwrite here.
-}
+    // Greeting icon is controlled by weather function now
 
 // ========================================
 // Search Functions
@@ -342,18 +341,8 @@ async function updateWeather() {
     }
 
     let query = `q=${encodeURIComponent(settings.weatherLocation)}`;
-    // Optionally, use geolocation:
-    // if ('geolocation' in navigator) {
-    //     navigator.geolocation. getCurrentPosition(pos => {
-    //         query = `lat=${pos.coords. latitude}&lon=${pos.coords.longitude}`;
-    //         fetchWeather(query);
-    //     }, () => {
-    //         fetchWeather(query);
-    //     });
-    // } else {
-    //     fetchWeather(query);
-    // }
-    // For now, just use city name:
+
+    // use city name:
     fetchWeather(query);
 }
 
