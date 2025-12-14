@@ -82,7 +82,7 @@ const allSearchEngines = {
     },
     amazon: {
         name: 'Amazon',
-        url: 'https://www.amazon.com/s?k=',
+        url: 'https://www.amazon.in/s?k=',
         icon: '<i class="fa-brands fa-amazon"></i>'
     },
     wikipedia: {
@@ -107,12 +107,13 @@ function loadSettings() {
         theme: 'dark',
         colorMode: 'multi',
         timeFormat: '12',
-        tempUnit: 'F',
-        showQuotes: 'true',
-        enabledEngines: ['google', 'duckduckgo', 'github', 'youtube'],
+        tempUnit: 'C',
+        showQuotes: 'false',
+        enabledEngines: ['google', 'youtube'],
         preferredEngine: 'google',
-        weatherLocation: 'New York,NY,US',
-        openWeatherApiKey: ''
+        weatherLocation: 'Mumbai,IN',
+        openWeatherApiKey: '',
+        waqiApiKey: ''
     };
     
     return {
@@ -125,7 +126,8 @@ function loadSettings() {
         enabledEngines: JSON.parse(localStorage.getItem('enabledEngines')) ?? defaults.enabledEngines,
         preferredEngine: localStorage.getItem('preferredEngine') ?? defaults.preferredEngine,
         weatherLocation: localStorage.getItem('weatherLocation') ?? defaults.weatherLocation,
-        openWeatherApiKey: localStorage.getItem('openWeatherApiKey') ??  defaults.openWeatherApiKey
+        openWeatherApiKey: localStorage.getItem('openWeatherApiKey') ??  defaults.openWeatherApiKey,
+        waqiApiKey: localStorage.getItem('waqiApiKey') ?? defaults.waqiApiKey
     };
 }
 
@@ -197,7 +199,7 @@ applyTheme(settings.theme);
 // DOM Elements
 // ========================================
 
-let searchInput, timeElement, dateElement, greetingElement, weatherElement, quoteElement, linksGrid;
+let searchInput, timeElement, dateElement, greetingElement, weatherElement, linksGrid;
 
 // ========================================
 // Time & Date Functions
@@ -251,9 +253,7 @@ function updateGreeting(hour) {
     greetingElement.textContent = userName ? `${greeting}, ${userName}` : greeting;
     
     const iconElement = document.getElementById('greeting-icon');
-    if (iconElement) {
-        iconElement.innerHTML = iconHtml;
-    }
+    // Greeting icon is controlled by weather; do not overwrite here.
 }
 
 // ========================================
@@ -262,21 +262,11 @@ function updateGreeting(hour) {
 
 function performSearch(query) {
     if (!query.trim()) return;
-    
-    // Use Chrome Search API if available (respects user's default search engine)
-    if (typeof chrome !== 'undefined' && chrome.search && chrome.search.query) {
-        chrome.search.query({
-            text: query,
-            disposition: 'CURRENT_TAB'
-        });
-    } else {
-        // Fallback for Firefox or when Chrome Search API is not available
-        const engine = allSearchEngines[currentEngine];
-        if (!engine) return;
-        
-        const searchUrl = engine.url + encodeURIComponent(query);
-        window.location.href = searchUrl;
-    }
+    // Always open search results in a new tab
+    const engine = allSearchEngines[currentEngine];
+    if (!engine) return;
+    const searchUrl = engine.url + encodeURIComponent(query);
+    window.open(searchUrl, '_blank');
 }
 
 function setSearchEngine(engine) {
@@ -389,17 +379,19 @@ async function fetchWeather(query) {
 
         const tempUnit = unit === 'metric' ? '°C' : '°F';
         
-        // Get the parent widget and find the icon element
-        const widgetElement = weatherElement.parentElement;
-        if (widgetElement) {
-            const iconElement = widgetElement.querySelector('.widget-icon');
-            if (iconElement) {
-                // Show OpenWeather icon
-                iconElement.innerHTML = `<img src="${iconUrl}" alt="" style="width:2em;height:2em;margin:-0.25em 0;vertical-align:middle;">`;
-            }
+        // Set greeting icon to weather image
+        const greetingIcon = document.getElementById('greeting-icon');
+        if (greetingIcon) {
+            greetingIcon.innerHTML = `<img src="${iconUrl}" alt="" style="width:2em;height:2em;margin:-0.25em 0;vertical-align:middle;">`;
         }
         
-        weatherElement.textContent = `${temp}${tempUnit} ${condition}`;
+        // Show city name before the weather text
+        const cityName = data.name || settings.weatherLocation.split(',')[0];
+        // Try to fetch AQI (WAQI preferred, then OpenWeather air pollution as fallback)
+        const lat = data.coord && data.coord.lat;
+        const lon = data.coord && data.coord.lon;
+        const aqiSuffix = await fetchAQI({ lat, lon });
+        weatherElement.textContent = `${cityName}, ${temp}${tempUnit} ${condition}${aqiSuffix}`;
     } catch (err) {
         console.error('Weather fetch error:', err);
         // Fall back to mock weather on error
@@ -407,7 +399,7 @@ async function fetchWeather(query) {
     }
 }
 
-function showMockWeather() {
+async function showMockWeather() {
     if (!weatherElement) return;
     
     const mockWeatherData = [
@@ -432,47 +424,76 @@ function showMockWeather() {
         unit = '°F';
     }
     
-    weatherElement.textContent = `${temp}${unit} ${weather.condition}`;
+    const mockLocation = (settings.weatherLocation || '').split(',')[0] || 'Unknown';
+    // Try to fetch AQI by city name when showing mock data
+    let aqiSuffix = '';
+    if (settings.waqiApiKey) {
+        aqiSuffix = await fetchAQI({ city: mockLocation });
+    }
+    weatherElement.textContent = `${mockLocation}, ${temp}${unit} ${weather.condition}${aqiSuffix}`;
     
-    // Get the parent widget and find the icon element
-    const widgetElement = weatherElement.parentElement;
-    if (widgetElement) {
-        const iconElement = widgetElement.querySelector('.widget-icon');
-        if (iconElement) {
-            iconElement.innerHTML = `<i class="fa-solid ${weather.icon}"></i>`;
+    // Set greeting icon to the mock weather icon
+    const greetingIcon = document.getElementById('greeting-icon');
+    if (greetingIcon) {
+        greetingIcon.innerHTML = `<i class="fa-solid ${weather.icon}"></i>`;
+    }
+}
+
+// ========================================
+// AQI Fetching (WAQI preferred, OpenWeather fallback)
+// ========================================
+async function fetchAQI({ lat, lon, city } = {}) {
+    try {
+        // Try WAQI first if token present
+        if (settings.waqiApiKey) {
+            let waqiUrl = '';
+            if (typeof lat !== 'undefined' && typeof lon !== 'undefined') {
+                waqiUrl = `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${settings.waqiApiKey}`;
+            } else if (city) {
+                waqiUrl = `https://api.waqi.info/feed/${encodeURIComponent(city)}/?token=${settings.waqiApiKey}`;
+            }
+
+            if (waqiUrl) {
+                const resp = await fetch(waqiUrl);
+                if (resp.ok) {
+                    const body = await resp.json();
+                    if (body && body.status === 'ok' && body.data && typeof body.data.aqi !== 'undefined') {
+                        const aqi = body.data.aqi;
+                        return ` | ${aqi} AQI`;
+                    }
+                }
+            }
         }
+
+        // Fallback: use OpenWeather Air Pollution API if we have coordinates and OpenWeather key
+        if (settings.openWeatherApiKey && typeof lat !== 'undefined' && typeof lon !== 'undefined') {
+            const resp = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${settings.openWeatherApiKey}`);
+            if (resp.ok) {
+                const body = await resp.json();
+                if (body && body.list && body.list[0] && body.list[0].main && typeof body.list[0].main.aqi !== 'undefined') {
+                    const aqiIndex = body.list[0].main.aqi; // 1-5
+                    const labels = {
+                        1: 'Good',
+                        2: 'Fair',
+                        3: 'Moderate',
+                        4: 'Poor',
+                        5: 'Very Poor'
+                    };
+                    const label = labels[aqiIndex] || 'Unknown';
+                    return ` | ${label} (${aqiIndex}) AQI`;
+                }
+            }
+        }
+
+    } catch (err) {
+        console.error('AQI fetch error:', err);
     }
+
+    // Nothing available
+    return '';
 }
 
 // ========================================
-// Quotes Function
-// ========================================
-
-const quotes = [
-    '"The only way to do great work is to love what you do." - Steve Jobs',
-    '"First, solve the problem.  Then, write the code." - John Johnson',
-    '"Simplicity is the soul of efficiency." - Austin Freeman',
-    '"Make it work, make it right, make it fast." - Kent Beck',
-    '"Talk is cheap. Show me the code." - Linus Torvalds',
-    '"Creativity is intelligence having fun." - Albert Einstein',
-    '"Done is better than perfect." - Sheryl Sandberg',
-    '"Stay hungry, stay foolish." - Steve Jobs',
-    '"Code is like humor. When you have to explain it, it\'s bad." - Cory House',
-];
-
-function updateQuote() {
-    const quoteWidget = document.querySelector('.quote-widget');
-    if (!quoteWidget || !quoteElement) return;
-    
-    if (settings.showQuotes === 'true') {
-        quoteWidget.style.display = 'flex';
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-        quoteElement.textContent = randomQuote;
-    } else {
-        quoteWidget.style.display = 'none';
-    }
-}
-
 // ========================================
 // Links Grid Rendering
 // ========================================
@@ -494,7 +515,7 @@ function renderLinksGrid() {
                 </h2>
                 <div class="links">
                     ${categoryLinks.map(link => `
-                        <a href="${link.url}" class="link-card">
+                        <a href="${link.url}" class="link-card" target="_blank" rel="noopener noreferrer">
                             <span class="link-icon"><i class="${link.icon || 'fa-solid fa-link'}"></i></span>
                             <span class="link-text">${link.name}</span>
                         </a>
@@ -608,12 +629,12 @@ function initSettings() {
     // Toggle button handlers
     document.querySelectorAll('.toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const setting = btn.dataset. setting;
+            const setting = btn.dataset.setting;
             const value = btn.dataset.value;
-            
+
             saveSettings(setting, value);
             updateToggleStates();
-            
+
             if (setting === 'theme') {
                 applyTheme(value);
             } else if (setting === 'colorMode') {
@@ -622,8 +643,6 @@ function initSettings() {
                 updateDateTime();
             } else if (setting === 'tempUnit') {
                 updateWeather();
-            } else if (setting === 'showQuotes') {
-                updateQuote();
             }
         });
     });
@@ -662,6 +681,18 @@ function initSettings() {
             updateWeather();
         });
     }
+
+    // WAQI API key input handler
+    const waqiInput = document.getElementById('setting-waqi-api-key');
+    if (waqiInput) {
+        waqiInput.addEventListener('input', (e) => {
+            saveSettings('waqiApiKey', e.target.value.trim());
+        });
+
+        waqiInput.addEventListener('blur', () => {
+            updateWeather();
+        });
+    }
     
     // Search engine checkboxes
     document.querySelectorAll('#search-engine-options input').forEach(checkbox => {
@@ -685,6 +716,36 @@ function initSettings() {
             renderSearchEngines();
         });
     });
+
+    // Backup export/import handlers
+    const exportBtn = document.getElementById('export-backup-btn');
+    const importInput = document.getElementById('import-backup-input');
+    const importBtn = document.getElementById('import-backup-btn');
+
+    if (exportBtn) {
+        exportBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Open export options modal
+            const em = document.getElementById('export-options-modal');
+            if (em) {
+                em.classList.add('active');
+                em.setAttribute('aria-hidden', 'false');
+            }
+        });
+    }
+
+    if (importBtn && importInput) {
+        importBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            importInput.value = '';
+            importInput.click();
+        });
+
+        importInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) handleImportFile(file);
+        });
+    }
     
     // Add category button
     const addCategoryBtn = document.getElementById('add-category-btn');
@@ -731,6 +792,12 @@ function populateSettingsUI() {
     if (apiKeyInput) {
         apiKeyInput.value = settings.openWeatherApiKey;
     }
+
+    // Populate WAQI API key input
+    const waqiInput = document.getElementById('setting-waqi-api-key');
+    if (waqiInput) {
+        waqiInput.value = settings.waqiApiKey || '';
+    }
     
     // Populate search engine checkboxes
     document.querySelectorAll('#search-engine-options input').forEach(checkbox => {
@@ -739,6 +806,394 @@ function populateSettingsUI() {
     
     updateToggleStates();
 }
+
+// ========================================
+// Backup / Restore
+// ========================================
+
+function buildBackupObject() {
+    return {
+        meta: {
+            version: 1,
+            timestamp: new Date().toISOString(),
+            generatedBy: 'startpage'
+        },
+        settings: {
+            userName: settings.userName || '',
+            theme: settings.theme || 'dark',
+            colorMode: settings.colorMode || 'multi',
+            timeFormat: settings.timeFormat || '12',
+            tempUnit: settings.tempUnit || 'C',
+            enabledEngines: settings.enabledEngines || [],
+            preferredEngine: settings.preferredEngine || 'google',
+            weatherLocation: settings.weatherLocation || ''
+        },
+        categories: categories,
+        links: links
+    };
+}
+
+function exportBackup() {
+    try {
+        const backup = buildBackupObject();
+        const json = JSON.stringify(backup, null, 2);
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const filename = `startpage-backup-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.json`;
+
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (err) {
+        console.error('Export failed', err);
+        showResultModal('Export Failed', 'Failed to export backup. See console for details.');
+    }
+}
+
+// Export selected sections (used by export options modal)
+function exportSelectedSections({ settings: exSettings, categories: exCats, links: exLinks, includeKeys }) {
+    try {
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const filename = `startpage-backup-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.json`;
+
+        const out = { meta: { version: 1, timestamp: new Date().toISOString(), generatedBy: 'startpage' } };
+
+        if (exSettings) {
+            out.settings = {
+                userName: settings.userName || '',
+                theme: settings.theme || 'dark',
+                colorMode: settings.colorMode || 'multi',
+                timeFormat: settings.timeFormat || '12',
+                tempUnit: settings.tempUnit || 'C',
+                enabledEngines: settings.enabledEngines || [],
+                preferredEngine: settings.preferredEngine || 'google',
+                weatherLocation: settings.weatherLocation || ''
+            };
+            if (includeKeys) {
+                out.settings.openWeatherApiKey = settings.openWeatherApiKey || '';
+                out.settings.waqiApiKey = settings.waqiApiKey || '';
+            }
+        }
+
+        if (exCats) {
+            out.categories = categories;
+        }
+
+        if (exLinks) {
+            out.links = links;
+        }
+
+        const json = JSON.stringify(out, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        // Close export modal silently (no alert)
+        const em = document.getElementById('export-options-modal');
+        if (em) { em.classList.remove('active'); em.setAttribute('aria-hidden', 'true'); }
+    } catch (err) {
+        console.error('Export selected failed', err);
+        showResultModal('Export Failed', 'Failed to export selected sections. See console for details.');
+    }
+}
+
+// Show a small result modal inside settings
+function showResultModal(title, message) {
+    const modal = document.getElementById('import-result-modal');
+    const titleEl = document.getElementById('import-result-title');
+    const msgEl = document.getElementById('import-result-message');
+    if (!modal) {
+        // Fallback to alert if modal missing
+        alert(message);
+        return;
+    }
+    titleEl.textContent = title || 'Result';
+    msgEl.textContent = message || '';
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+// Close handler for modal
+document.addEventListener('DOMContentLoaded', () => {
+    const closeBtn = document.getElementById('import-modal-close');
+    const modal = document.getElementById('import-result-modal');
+    if (closeBtn && modal) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        });
+    }
+    
+    // Import confirm modal buttons
+    const importMergeBtn = document.getElementById('import-merge-btn');
+    const importReplaceBtn = document.getElementById('import-replace-btn');
+    const importCancelBtn = document.getElementById('import-cancel-btn');
+    const importConfirmModal = document.getElementById('import-confirm-modal');
+
+    if (importMergeBtn) {
+        importMergeBtn.addEventListener('click', () => {
+            if (window.__importCandidate) {
+                applyBackupMerge(window.__importCandidate);
+            }
+            if (importConfirmModal) { importConfirmModal.classList.remove('active'); importConfirmModal.setAttribute('aria-hidden', 'true'); }
+        });
+    }
+
+    if (importReplaceBtn) {
+        importReplaceBtn.addEventListener('click', () => {
+            if (window.__importCandidate) {
+                applyBackupReplace(window.__importCandidate);
+            }
+            if (importConfirmModal) { importConfirmModal.classList.remove('active'); importConfirmModal.setAttribute('aria-hidden', 'true'); }
+        });
+    }
+
+    if (importCancelBtn) {
+        importCancelBtn.addEventListener('click', () => {
+            if (importConfirmModal) { importConfirmModal.classList.remove('active'); importConfirmModal.setAttribute('aria-hidden', 'true'); }
+            window.__importCandidate = null;
+        });
+    }
+
+    // Export options modal buttons
+    const exportModal = document.getElementById('export-options-modal');
+    const exportCancelBtn = document.getElementById('export-cancel-btn');
+    const exportConfirmBtn = document.getElementById('export-confirm-btn');
+    if (exportCancelBtn) {
+        exportCancelBtn.addEventListener('click', () => {
+            if (exportModal) { exportModal.classList.remove('active'); exportModal.setAttribute('aria-hidden', 'true'); }
+        });
+    }
+
+    if (exportConfirmBtn) {
+        exportConfirmBtn.addEventListener('click', () => {
+            const exSettings = document.getElementById('exp-settings')?.checked;
+            const exCats = document.getElementById('exp-categories')?.checked;
+            const exLinks = document.getElementById('exp-links')?.checked;
+            const includeKeys = document.getElementById('exp-include-keys')?.checked;
+
+            if (!exSettings && !exCats && !exLinks) {
+                showResultModal('Export Error', 'Please select at least one section to export.');
+                return;
+            }
+
+            exportSelectedSections({ settings: !!exSettings, categories: !!exCats, links: !!exLinks, includeKeys: !!includeKeys });
+        });
+    }
+});
+
+function applyBackupReplace(backup) {
+    try {
+        // Replace settings (but DO NOT overwrite API keys)
+        const s = backup.settings || {};
+        saveSettings('userName', s.userName || '');
+        saveSettings('theme', s.theme || 'dark');
+        saveSettings('colorMode', s.colorMode || 'multi');
+        saveSettings('timeFormat', s.timeFormat || '12');
+        saveSettings('tempUnit', s.tempUnit || 'C');
+        saveSettings('enabledEngines', s.enabledEngines || []);
+        saveSettings('preferredEngine', s.preferredEngine || (s.enabledEngines && s.enabledEngines[0]) || 'google');
+        saveSettings('weatherLocation', s.weatherLocation || '');
+
+        // Replace categories and links
+        categories = Array.isArray(backup.categories) ? backup.categories : [];
+        links = backup.links || {};
+
+        saveCategories(categories);
+        saveLinks(links);
+
+        // Re-render UI
+        renderCategoriesSettings();
+        renderLinksGrid();
+        renderSearchEngines();
+        populateSettingsUI();
+
+        showResultModal('Import Complete', 'Backup imported (replace).');
+    } catch (err) {
+        console.error('Apply replace failed', err);
+        showResultModal('Import Failed', 'Failed to apply backup. See console for details.');
+    }
+}
+
+function applyBackupMerge(backup) {
+    try {
+        const s = backup.settings || {};
+        // Merge simple settings (overwrite current with backup where present)
+        if (s.userName) saveSettings('userName', s.userName);
+        if (s.theme) saveSettings('theme', s.theme);
+        if (s.colorMode) saveSettings('colorMode', s.colorMode);
+        if (s.timeFormat) saveSettings('timeFormat', s.timeFormat);
+        if (s.tempUnit) saveSettings('tempUnit', s.tempUnit);
+        if (Array.isArray(s.enabledEngines)) saveSettings('enabledEngines', Array.from(new Set([...(settings.enabledEngines||[]), ...s.enabledEngines])));
+        if (s.preferredEngine) saveSettings('preferredEngine', s.preferredEngine);
+        if (s.weatherLocation) saveSettings('weatherLocation', s.weatherLocation);
+
+        // Merge categories: avoid duplicate ids. If id exists, skip; otherwise add.
+        const existingIds = new Set(categories.map(c => c.id));
+        (backup.categories || []).forEach(cat => {
+            if (!cat.id || existingIds.has(cat.id)) {
+                // generate new id to avoid collision
+                const newId = 'imp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                categories.push({ ...cat, id: newId });
+            } else {
+                categories.push(cat);
+            }
+        });
+
+        // Merge links: for each category in backup, append links to existing category (match by id), otherwise create new category and assign links
+        Object.keys(backup.links || {}).forEach(catId => {
+            const catLinks = backup.links[catId] || [];
+            let targetId = catId;
+            if (!categories.find(c => c.id === catId)) {
+                // try to find category by name
+                const byName = (backup.categories || []).find(c => c.id === catId);
+                if (byName) {
+                    // add category
+                    categories.push(byName);
+                } else {
+                    // create a new category id
+                    targetId = 'imp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                    categories.push({ id: targetId, name: catId, icon: 'fa-solid fa-folder' });
+                }
+            }
+
+            if (!links[targetId]) links[targetId] = [];
+
+            // Append links while avoiding duplicates by URL
+            const existingUrls = new Set((links[targetId] || []).map(l => l.url));
+            catLinks.forEach(link => {
+                if (!existingUrls.has(link.url)) {
+                    links[targetId].push(link);
+                }
+            });
+        });
+
+        // Persist
+        saveCategories(categories);
+        saveLinks(links);
+
+        // Re-render UI
+        renderCategoriesSettings();
+        renderLinksGrid();
+        renderSearchEngines();
+        populateSettingsUI();
+
+        showResultModal('Import Complete', 'Backup imported (merge).');
+    } catch (err) {
+        console.error('Apply merge failed', err);
+        showResultModal('Import Failed', 'Failed to merge backup. See console for details.');
+    }
+}
+
+function handleImportFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const text = e.target.result;
+            const data = JSON.parse(text);
+            // Validate and show confirm modal
+            const validation = validateBackup(data);
+            if (!validation.valid) {
+                showResultModal('Import Error', 'Backup validation failed:\n' + validation.errors.join('\n'));
+                return;
+            }
+
+            // Hold parsed backup globally until user chooses Merge/Replace
+            window.__importCandidate = data;
+
+            // Open confirm modal
+            const icm = document.getElementById('import-confirm-modal');
+            if (icm) {
+                // Build a friendly summary
+                const catCount = Array.isArray(data.categories) ? data.categories.length : 0;
+                const linksCount = data.links ? Object.values(data.links).reduce((s, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0) : 0;
+                const ts = (data.meta && data.meta.timestamp) ? new Date(data.meta.timestamp).toLocaleString() : 'unknown';
+                const msg = `Backup from ${ts} — ${catCount} categories, ${linksCount} links. Use the checkbox below to include API keys if desired.`;
+                const msgEl = document.getElementById('import-confirm-message');
+                if (msgEl) msgEl.textContent = msg;
+                icm.classList.add('active');
+                icm.setAttribute('aria-hidden', 'false');
+            } else {
+                // fallback: replace immediately
+                applyBackupReplace(data);
+            }
+        } catch (err) {
+            console.error('Import parse error', err);
+            showResultModal('Import Failed', 'Failed to parse backup file. Make sure it is valid JSON.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Simple JSON schema validation with friendly messages
+function validateBackup(obj) {
+    const errors = [];
+    if (!obj || typeof obj !== 'object') {
+        errors.push('File is not a valid JSON object.');
+        return { valid: false, errors };
+    }
+
+    if (!obj.meta || typeof obj.meta.version === 'undefined') {
+        errors.push('Missing meta.version in backup.');
+    }
+
+    if (obj.settings) {
+        if (typeof obj.settings !== 'object') errors.push('settings must be an object.');
+        else {
+            if (obj.settings.userName && typeof obj.settings.userName !== 'string') errors.push('settings.userName must be a string.');
+            if (obj.settings.enabledEngines && !Array.isArray(obj.settings.enabledEngines)) errors.push('settings.enabledEngines must be an array.');
+        }
+    }
+
+    if (obj.categories) {
+        if (!Array.isArray(obj.categories)) errors.push('categories must be an array.');
+        else {
+            obj.categories.forEach((c, i) => {
+                if (!c || typeof c !== 'object') errors.push(`categories[${i}] must be an object.`);
+                else {
+                    if (!c.id || typeof c.id !== 'string') errors.push(`categories[${i}].id is required and must be a string.`);
+                    if (!c.name || typeof c.name !== 'string') errors.push(`categories[${i}].name is required and must be a string.`);
+                }
+            });
+        }
+    }
+
+    if (obj.links) {
+        if (typeof obj.links !== 'object' || Array.isArray(obj.links)) errors.push('links must be an object mapping categoryId -> array of links.');
+        else {
+            Object.keys(obj.links).forEach(catId => {
+                const arr = obj.links[catId];
+                if (!Array.isArray(arr)) errors.push(`links['${catId}'] must be an array.`);
+                else {
+                    arr.forEach((l, j) => {
+                        if (!l || typeof l !== 'object') errors.push(`links['${catId}'][${j}] must be an object.`);
+                        else {
+                            if (!l.name || typeof l.name !== 'string') errors.push(`links['${catId}'][${j}].name is required and must be a string.`);
+                            if (!l.url || typeof l.url !== 'string') errors.push(`links['${catId}'][${j}].url is required and must be a string.`);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    return { valid: errors.length === 0, errors };
+}
+
 
 function updateToggleStates() {
     document.querySelectorAll('.toggle-btn').forEach(btn => {
@@ -1006,7 +1461,7 @@ const commands = {
     'theme dark': () => applyTheme('dark'),
     'theme light': () => applyTheme('light'),
     'new tab': () => window.open('about:blank', '_blank'),
-    'github': () => window. location.href = 'https://github.com',
+    'github': () => window.open('https://github.com', '_blank'),
     'settings': () => document.getElementById('settings-overlay').classList.add('active'),
 };
 
@@ -1033,8 +1488,9 @@ function init() {
     dateElement = document.getElementById('date');
     greetingElement = document.getElementById('greeting');
     weatherElement = document.getElementById('weather');
-    quoteElement = document.getElementById('quote');
     linksGrid = document. getElementById('links-grid');
+    // Ensure weather location set to Mumbai as requested
+    saveSettings('weatherLocation', 'Mumbai,IN');
     
     // Render dynamic content
     renderLinksGrid();
@@ -1043,13 +1499,22 @@ function init() {
     // Update time immediately and every second
     updateDateTime();
     setInterval(updateDateTime, 1000);
+
+    // Toggle time format when clicking on the time element
+    if (timeElement) {
+        timeElement.style.cursor = 'pointer';
+        timeElement.addEventListener('click', () => {
+            const newFormat = settings.timeFormat === '12' ? '24' : '12';
+            saveSettings('timeFormat', newFormat);
+            updateDateTime();
+        });
+    }
     
     // Update weather
     updateWeather();
     setInterval(updateWeather, 600000);
     
-    // Set random quote
-    updateQuote();
+    // Quotes removed
     
     // Restore preferred search engine
     if (settings.enabledEngines.includes(settings.preferredEngine)) {

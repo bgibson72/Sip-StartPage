@@ -21,8 +21,13 @@
         <!-- Header with greeting and time -->
         <header class="header">
             <div class="greeting">
-                <span class="icon" id="greeting-icon"><i class="fa-solid fa-sun"></i></span>
-                <span class="greeting-text" id="greeting">Good evening, Bryan</span>
+                <span class="icon" id="greeting-icon"></span>
+                <div style="display:flex;flex-direction:column;">
+                    <span class="greeting-text" id="greeting">Good evening, Bryan</span>
+                    <div class="weather-widget" style="margin-top:0.25rem;display:flex;align-items:center;gap:0.5rem;">
+                        <span class="widget-text" id="weather">Loading...</span>
+                    </div>
+                </div>
             </div>
             <div class="header-right">
                 <div class="datetime">
@@ -33,62 +38,7 @@
         </header>
 
         <!-- Help Modal -->
-        <div class="help-overlay" id="help-overlay">
-            <div class="help-modal">
-                <div class="help-header">
-                    <h3><i class="fa-solid fa-circle-question"></i> Help</h3>
-                    <button class="help-close" id="help-close">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                <div class="help-content">
-                    <section class="help-section">
-                        <h4><i class="fa-solid fa-icons"></i> Customizing Icons</h4>
-                        <p>This startpage uses <a href="https://fontawesome.com/search?o=r&m=free" target="_blank">Font Awesome</a> icons. You can customize icons for categories and links in Settings.</p>
-                    </section>
-                    
-                    <section class="help-section">
-                        <h4><i class="fa-solid fa-magnifying-glass"></i> Step 1: Find an Icon</h4>
-                        <ol class="help-steps">
-                            <li>Go to <a href="https://fontawesome.com/search?o=r&m=free" target="_blank">fontawesome.com/search</a></li>
-                            <li>Type a keyword in the search box (e.g., "linux", "music", "cloud")</li>
-                            <li>Click the <strong>"Free"</strong> filter button on the right side to show only free icons</li>
-                            <li>Click on the icon you want to use</li>
-                        </ol>
-                    </section>
-                    
-                    <section class="help-section">
-                        <h4><i class="fa-solid fa-copy"></i> Step 2: Copy the Icon Code</h4>
-                        <ol class="help-steps">
-                            <li>After clicking an icon, a popup will appear</li>
-                            <li>Look for the HTML code that looks like: <code>&lt;i class="fa-brands fa-linux"&gt;&lt;/i&gt;</code></li>
-                            <li>Copy <strong>only the class value</strong> — the part inside the quotes</li>
-                            <li>For example, copy: <code>fa-brands fa-linux</code></li>
-                        </ol>
-                    </section>
-                    
-                    <section class="help-section">
-                        <h4><i class="fa-solid fa-paste"></i> Step 3: Use in Settings</h4>
-                        <ol class="help-steps">
-                            <li>Open Settings <i class="fa-solid fa-gear"></i> and go to the Categories or Links tab</li>
-                            <li>Paste the icon code into the icon field (the first input box)</li>
-                            <li>You'll see a live preview of your icon appear</li>
-                        </ol>
-                    </section>
-                    
-                    <section class="help-section">
-                        <h4><i class="fa-solid fa-lightbulb"></i> Examples</h4>
-                        <ul class="icon-examples">
-                            <li><code>fa-solid fa-code</code> → <i class="fa-solid fa-code"></i> (solid style)</li>
-                            <li><code>fa-brands fa-github</code> → <i class="fa-brands fa-github"></i> (brand logo)</li>
-                            <li><code>fa-solid fa-gamepad</code> → <i class="fa-solid fa-gamepad"></i></li>
-                            <li><code>fa-brands fa-spotify</code> → <i class="fa-brands fa-spotify"></i></li>
-                        </ul>
-                        <p class="help-tip"><strong>Tip:</strong> Use <code>fa-solid</code> for general icons or <code>fa-brands</code> for company/brand logos.</p>
-                    </section>
-                </div>
-            </div>
-        </div>
+        <!-- Help removed to keep UI minimal -->
 
         <!-- Settings Modal -->
         <div class="settings-overlay" id="settings-overlay">
@@ -157,27 +107,7 @@
                             </div>
                         </div>
                         
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <i class="fa-solid fa-temperature-half"></i>
-                                <span>Temperature</span>
-                            </div>
-                            <div class="setting-toggle">
-                                <button class="toggle-btn" data-setting="tempUnit" data-value="F">°F</button>
-                                <button class="toggle-btn" data-setting="tempUnit" data-value="C">°C</button>
-                            </div>
-                        </div>
-                        
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <i class="fa-solid fa-quote-left"></i>
-                                <span>Show Quotes</span>
-                            </div>
-                            <div class="setting-toggle">
-                                <button class="toggle-btn" data-setting="showQuotes" data-value="true"><i class="fa-solid fa-eye"></i> Show</button>
-                                <button class="toggle-btn" data-setting="showQuotes" data-value="false"><i class="fa-solid fa-eye-slash"></i> Hide</button>
-                            </div>
-                        </div>
+                        <!-- Temperature toggle and Quotes removed to keep UI minimal and Celsius-only -->
                         
                         <div class="setting-item">
                             <div class="setting-label">
@@ -193,6 +123,13 @@
                                 <span>OpenWeather API Key (<a href="https://openweathermap.org" target="_blank">openweathermap.org</a>)</span>
                             </div>
                             <input type="text" id="setting-weather-api-key" class="setting-input" placeholder="Enter key">
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <i class="fa-solid fa-wind"></i>
+                                <span>WAQI API Key (<a href="https://aqicn.org" target="_blank">aqicn.org</a>)</span>
+                            </div>
+                            <input type="text" id="setting-waqi-api-key" class="setting-input" placeholder="Enter WAQI token">
                         </div>
                         
                         <div class="setting-item setting-item-vertical">
@@ -243,6 +180,20 @@
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Backup / Restore (separate block) -->
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <i class="fa-solid fa-database"></i>
+                                <span>Backup / Restore</span>
+                            </div>
+                            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+                                <button class="add-btn" id="export-backup-btn"><i class="fa-solid fa-download"></i> Export Backup</button>
+                                <input type="file" id="import-backup-input" accept="application/json" style="display:none">
+                                <button class="add-btn" id="import-backup-btn"><i class="fa-solid fa-upload"></i> Import Backup</button>
+                            </div>
+                            <small class="setting-help">Backups do not include API keys. Files are JSON and will replace your current settings.</small>
+                        </div>
                     </div>
                     
                     <!-- Categories Tab -->
@@ -273,27 +224,65 @@
                         </button>
                     </div>
                 </div>
+                <!-- Import/Result Modal -->
+                <div class="import-modal" id="import-result-modal" aria-hidden="true">
+                    <h4 id="import-result-title">Import Result</h4>
+                    <p id="import-result-message">Completed.</p>
+                    <div class="modal-actions">
+                        <button class="modal-btn" id="import-modal-close">OK</button>
+                    </div>
+                </div>
+                <!-- Import Confirm Modal (Merge / Replace / Cancel) -->
+                <div class="confirm-modal" id="import-confirm-modal" aria-hidden="true">
+                    <div class="confirm-content">
+                            <h3>Import Backup</h3>
+                            <p id="import-confirm-message">Do you want to merge or replace your current settings with this backup?</p>
+                            <div style="margin-top:0.5rem;">
+                                <label><input type="checkbox" id="import-include-keys"> Include API keys (Import with caution)</label>
+                            </div>
+                            <div class="confirm-actions">
+                                <button class="modal-btn" id="import-merge-btn">Merge</button>
+                                <button class="modal-btn primary" id="import-replace-btn">Replace</button>
+                                <button class="modal-btn" id="import-cancel-btn">Cancel</button>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Export Options Modal -->
+                <div class="export-modal" id="export-options-modal" aria-hidden="true">
+                    <div class="export-content">
+                        <h3>Export Options</h3>
+                        <p>Select sections to include in the export:</p>
+                        <div class="export-fields">
+                            <label><input type="checkbox" id="exp-settings" checked> Settings</label>
+                            <label><input type="checkbox" id="exp-categories" checked> Categories</label>
+                            <label><input type="checkbox" id="exp-links" checked> Links</label>
+                        </div>
+                        <div style="margin-top:0.5rem;">
+                            <label><input type="checkbox" id="exp-include-keys"> Include API keys (Export with caution)</label>
+                        </div>
+                        <div class="confirm-actions" style="margin-top:1rem;">
+                            <button class="modal-btn" id="export-cancel-btn">Cancel</button>
+                            <button class="modal-btn primary" id="export-confirm-btn">Export</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Search Bar -->
         <div class="search-row">
             <div class="search-container">
-                <div class="search-box">
+                    <div class="search-box">
                     <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
                     <input type="text" id="search" placeholder="Search the web..." autocomplete="off" autofocus>
                     <div class="search-engines">
                         <button class="engine active" data-engine="google" title="Google"><i class="fa-brands fa-google"></i></button>
-                        <button class="engine" data-engine="duckduckgo" title="DuckDuckGo"><span class="nf-icon">󰇥</span></button>
-                        <button class="engine" data-engine="github" title="GitHub"><i class="fa-brands fa-github"></i></button>
                         <button class="engine" data-engine="youtube" title="YouTube"><i class="fa-brands fa-youtube"></i></button>
                     </div>
                 </div>
             </div>
             <div class="toolbar-btns">
-                <button class="toolbar-btn" id="help-btn" title="Help">
-                    <i class="fa-solid fa-circle-question"></i>
-                </button>
                 <button class="toolbar-btn" id="settings-btn" title="Settings">
                     <i class="fa-solid fa-gear"></i>
                 </button>
@@ -307,22 +296,14 @@
 
         <!-- Footer Widget -->
         <footer class="footer">
-            <div class="widget weather-widget">
-                <span class="widget-icon"><i class="fa-solid fa-cloud-sun"></i></span>
-                <span class="widget-text" id="weather">Loading...</span>
-            </div>
-            <div class="widget quote-widget">
-                <span class="widget-icon"><i class="fa-solid fa-quote-left"></i></span>
-                <span class="widget-text" id="quote">"The only way to do great work is to love what you do."</span>
+            <div class="footer-socials">
+                <a class="social" href="https://github.com/motionkartik" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                <a class="social" href="https://youtu.be/b91ObORavYU" target="_blank" rel="noopener noreferrer" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <a class="social" href="https://www.imdb.com/name/nm14072156" target="_blank" rel="noopener noreferrer" title="IMDB"><i class="fa-solid fa-film"></i></a>
+                <a class="social" href="https://www.behance.net/motionkartik" target="_blank" rel="noopener noreferrer" title="Behance"><i class="fa-brands fa-behance"></i></a>
+                <a class="social" href="https://www.linkedin.com/in/motionkartik" target="_blank" rel="noopener noreferrer" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </footer>
-
-        <!-- Keyboard Hints -->
-        <div class="keyboard-hints">
-            <span class="hint"><kbd>/</kbd> Search</span>
-            <span class="hint"><kbd>1-4</kbd> Engine</span>
-            <span class="hint"><kbd>Esc</kbd> Clear</span>
-        </div>
     </div>
 
     <script src="script.js"></script>

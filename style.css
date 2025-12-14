@@ -291,6 +291,18 @@ body {
     animation: pulse 2s ease-in-out infinite;
 }
 
+/* Ensure greeting weather icon (image or FA <i>) fits nicely */
+.greeting .icon img {
+    width: 2rem;
+    height: 2rem;
+    display: block;
+}
+
+.greeting .icon i {
+    font-size: 2rem;
+    display: inline-block;
+}
+
 @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.8; transform: scale(1.1); }
@@ -300,6 +312,16 @@ body {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text);
+}
+
+.header .weather-widget {
+    margin-top: 0.25rem;
+    align-items: center;
+}
+
+.header .weather-widget .widget-text {
+    font-size: 0.9rem;
+    color: var(--subtext0);
 }
 
 .header-right {
@@ -731,6 +753,76 @@ body {
     text-align: center;
 }
 
+/* Import/Result Modal inside Settings */
+.import-modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: var(--surface0);
+    border: 1px solid var(--glass-border);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    min-width: 320px;
+    z-index: 1100;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    display: none;
+}
+.import-modal.active {
+    display: block;
+    transform: translate(-50%, -50%) scale(1);
+}
+.import-modal h4 { margin-bottom: var(--spacing-sm); color: var(--text); }
+.import-modal p { color: var(--subtext0); font-size: 0.9rem; margin-bottom: var(--spacing-md); }
+.import-modal .modal-actions { display:flex; gap:var(--spacing-sm); justify-content:flex-end; }
+.import-modal .modal-actions .modal-btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--mantle);
+    color: var(--subtext1);
+    cursor: pointer;
+}
+.import-modal .modal-actions .modal-btn.primary {
+    background: var(--primary);
+    color: var(--crust);
+    border-color: var(--primary);
+}
+
+/* Full-screen confirm modal (import) */
+.confirm-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+    z-index: 1200;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+.confirm-modal.active { visibility: visible; opacity: 1; }
+.confirm-modal .confirm-content {
+    background: var(--base);
+    border: 1px solid var(--glass-border);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    min-width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.confirm-modal h3 { margin-bottom: var(--spacing-sm); color: var(--text); }
+.confirm-actions { display:flex; gap:var(--spacing-sm); justify-content:flex-end; margin-top: var(--spacing-md); }
+.modal-btn { padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: var(--mantle); color: var(--subtext1); cursor: pointer; }
+.modal-btn.primary { background: var(--primary); color: var(--crust); border-color: var(--primary); }
+
+/* Export modal specific */
+.export-modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.55); z-index:1200; visibility:hidden; opacity:0; transition: opacity var(--transition-fast); }
+.export-modal.active { visibility: visible; opacity: 1; }
+.export-modal .export-content { background: var(--base); border:1px solid var(--glass-border); padding: var(--spacing-lg); border-radius: var(--radius-md); min-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+.export-fields { display:flex; flex-direction:column; gap: 0.25rem; margin-top: 0.25rem; }
+.export-fields label { color: var(--text); font-size: 0.95rem; }
+
 .setting-toggle {
     display: flex;
     background: var(--mantle);
@@ -1067,215 +1159,13 @@ body {
     white-space: nowrap;
 }
 
-/* Help Modal */
-.help-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1001;
-    opacity: 0;
-    visibility: hidden;
-    transition: all var(--transition-normal);
-}
-
-.help-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.help-modal {
-    background: var(--base);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    width: 100%;
-    max-width: 800px;
-    height: 600px;
-    max-height: 85vh;
-    margin: var(--spacing-lg);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    transform: scale(0.9) translateY(-20px);
-    transition: transform var(--transition-normal);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.help-overlay.active .help-modal {
-    transform: scale(1) translateY(0);
-}
-
-.help-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid var(--glass-border);
-}
-
-.help-header h3 {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.help-header h3 i {
-    color: var(--primary);
-}
-
-.help-close {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-sm);
-    color: var(--overlay1);
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.help-close:hover {
-    background: var(--surface0);
-    color: var(--red);
-}
-
-.help-content {
-    padding: var(--spacing-lg);
-    overflow-y: auto;
-}
-
-.help-section {
-    margin-bottom: var(--spacing-lg);
-}
-
-.help-section:last-child {
-    margin-bottom: 0;
-}
-
-.help-section h4 {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: var(--spacing-sm);
-}
-
-.help-section h4 i {
-    color: var(--primary);
-}
-
-.help-section p {
-    font-size: 0.85rem;
-    color: var(--subtext0);
-    line-height: 1.5;
-    margin-bottom: var(--spacing-sm);
-}
-
-.help-section a {
-    color: var(--primary);
-    text-decoration: none;
-}
-
-.help-section a:hover {
-    text-decoration: underline;
-}
-
-.help-steps {
-    padding-left: var(--spacing-lg);
-    margin: 0 0 var(--spacing-sm) 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.help-steps li {
-    font-size: 0.85rem;
-    color: var(--subtext0);
-    line-height: 1.5;
-    padding-left: var(--spacing-xs);
-}
-
-.help-steps li::marker {
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.help-steps code {
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    color: var(--primary);
-    background: var(--mantle);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-}
-
-.help-steps strong {
-    color: var(--text);
-}
-
-.icon-examples {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 var(--spacing-sm) 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.icon-examples li {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 0.85rem;
-    color: var(--subtext0);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background: var(--surface0);
-    border-radius: var(--radius-sm);
-}
-
-.icon-examples code {
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    color: var(--primary);
-    background: var(--mantle);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-}
-
-.icon-examples i {
-    color: var(--text);
-    width: 20px;
-    text-align: center;
-}
-
-.help-tip {
-    background: var(--surface0);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-sm);
-    border-left: 3px solid var(--primary);
-    margin-top: var(--spacing-lg);
-}
+/* Help modal styles removed */
 
 /* Footer */
 .footer {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding: var(--spacing-lg);
     background: var(--glass-bg);
@@ -1285,56 +1175,96 @@ body {
     gap: var(--spacing-xl);
 }
 
+.footer-socials {
+    /* Make icons stretch evenly across the footer width and be responsive */
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.footer .social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: calc(var(--spacing-lg) * 1.6); /* responsive height using spacing-lg */
+    padding: 0 var(--spacing-md);
+    border-radius: 12px;
+    background: var(--surface0);
+    color: var(--overlay1);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer .social i {
+    font-size: 1.05rem;
+}
+
+/* Copy link-card hover/border + shimmer effect for socials */
+.footer .social::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+    transition: left var(--transition-slow);
+}
+
+.footer .social:hover::before {
+    left: 100%;
+}
+
+.footer .social:hover {
+    background: var(--surface0);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateX(4px);
+}
+
 .widget {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     white-space: nowrap;
 }
+    /* quote and keyboard-hint styles removed */
 
-.widget-icon {
-    font-size: 1.3rem;
-    color: var(--accent);
-}
+    /* Social button hover labels (show text on hover) */
+    .footer .social {
+        position: relative;
+    }
 
-.widget-icon img {
-    filter: brightness(0) saturate(100%) invert(79%) sepia(14%) saturate(1076%) hue-rotate(128deg) brightness(95%) contrast(92%);
-}
+    .footer .social::after {
+        content: attr(title);
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--surface0);
+        color: var(--text);
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        transform-origin: bottom center;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
 
-.widget-text {
-    font-size: 0.85rem;
-    color: var(--subtext0);
-}
-
-.quote-widget {
-    flex: 1;
-    justify-content: flex-end;
-    min-width: 0;
-}
-
-.quote-widget .widget-text {
-    font-style: italic;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.keyboard-hints {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-lg);
-    padding: var(--spacing-md) 0;
-    margin-top: var(--spacing-md);
-}
-
-.hint {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    font-size: 0.75rem;
-    color: var(--overlay0);
-}
-
+    .footer .social:hover::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-4px);
+    }
 kbd {
     display: inline-flex;
     align-items: center;
