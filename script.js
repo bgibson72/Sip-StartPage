@@ -109,6 +109,7 @@ const allSearchEngines = {
 function loadSettings() {
     const defaults = {
         userName: '',
+        gridColumns: '',
         colorScheme: 'catppuccin',
         theme: 'dark',
         colorMode: 'multi',
@@ -130,6 +131,7 @@ function loadSettings() {
     
     return {
         userName: localStorage.getItem('userName') ??  defaults.userName,
+        gridColumns: localStorage.getItem('gridColumns') ?? defaults.gridColumns,
         colorScheme: localStorage.getItem('colorScheme') ?? defaults.colorScheme,
         theme: localStorage.getItem('theme') ?? defaults.theme,
         colorMode: localStorage.getItem('colorMode') ?? defaults.colorMode,
@@ -670,16 +672,28 @@ function renderLinksGrid() {
 function updateGridLayout() {
     if (!linksGrid) return;
     
-    const categoryCount = categories.length;
+    // Check for custom column setting
+    const customCols = parseInt(settings.gridColumns);
     
-    linksGrid.classList.remove('grid-single', 'grid-even', 'grid-odd');
+    // Reset all classes first
+    linksGrid.classList.remove('grid-single', 'grid-even', 'grid-odd', 'grid-custom');
+    linksGrid.style.removeProperty('--grid-columns');
     
-    if (categoryCount === 1) {
-        linksGrid. classList.add('grid-single');
-    } else if (categoryCount % 2 === 0) {
-        linksGrid.classList.add('grid-even');
+    if (customCols && customCols > 0) {
+        // Apply custom grid layout
+        linksGrid.classList.add('grid-custom');
+        linksGrid.style.setProperty('--grid-columns', customCols);
     } else {
-        linksGrid.classList. add('grid-odd');
+        // Default behaviour
+        const categoryCount = categories.length;
+        
+        if (categoryCount === 1) {
+            linksGrid.classList.add('grid-single');
+        } else if (categoryCount % 2 === 0) {
+            linksGrid.classList.add('grid-even');
+        } else {
+            linksGrid.classList.add('grid-odd');
+        }
     }
 }
 
@@ -787,6 +801,15 @@ function initSettings() {
             updateGreeting(new Date().getHours());
         });
     }
+
+    // Grid columns input handler
+    const gridColumnsInput = document.getElementById('setting-grid-columns');
+    if (gridColumnsInput) {
+        gridColumnsInput.addEventListener('input', (e) => {
+            saveSettings('gridColumns', e.target.value);
+            updateGridLayout();
+        });
+    }
     
     // Color scheme dropdown handler
     const colorSchemeSelect = document.getElementById('color-scheme-select');
@@ -877,6 +900,12 @@ function populateSettingsUI() {
     const nameInput = document.getElementById('setting-name');
     if (nameInput) {
         nameInput.value = settings.userName;
+    }
+
+    // Populate grid columns input
+    const gridColumnsInput = document.getElementById('setting-grid-columns');
+    if (gridColumnsInput) {
+        gridColumnsInput.value = settings.gridColumns;
     }
     
     // Populate color scheme dropdown
@@ -1383,6 +1412,7 @@ function exportSettings() {
         exportDate: new Date().toISOString(),
         settings: {
             userName: localStorage.getItem('userName'),
+            gridColumns: localStorage.getItem('gridColumns'),
             colorScheme: localStorage.getItem('colorScheme'),
             theme: localStorage.getItem('theme'),
             colorMode: localStorage.getItem('colorMode'),
