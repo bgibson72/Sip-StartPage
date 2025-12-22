@@ -105,6 +105,11 @@ const allSearchEngines = {
         name: 'Internet Archive',
         url: 'https://archive.org/search?query=',
         icon: '<i class="fa-solid fa-box-archive"></i>'
+    },
+    kagi: {
+        name: 'Kagi',
+        url: 'https://kagi.com/search?q=',
+        icon: '<i class="fa-solid fa-k"></i>'
     }
 };
 
