@@ -2,13 +2,58 @@
 *.zip
 *.tar.gz
 sip-extension-build/
+build-safari.sh
 
 # Store submission documents
 SUBMISSION_GUIDE.md
 RELEASE_NOTES_*.md
+APP-STORE-CHECKLIST.md
+SAFARI*.md
+START-HERE.txt
+XCODE-FIX.md
+
 
 # OS files
 .DS_Store
 
 # Node modules (if added in future)
 node_modules/
+
+# Xcode
+## User settings
+Sip Safari/xcuserdata/
+
+## Build products
+Sip Safari/build/
+Sip Safari/DerivedData/
+
+## Various Xcode settings
+Sip Safari/*.pbxuser
+Sip Safari/*.mode1v3
+Sip Safari/*.mode2v3
+Sip Safari/*.perspectivev3
+Sip Safari/*.xcworkspace
+!Sip Safari/*.xcworkspace/contents.xcworkspacedata
+Sip Safari/*.xccheckout
+Sip Safari/*.moved-aside
+
+## Obj-C/Swift specific
+Sip Safari/*.hmap
+Sip Safari/*.ipa
+Sip Safari/*.dSYM.zip
+Sip Safari/*.dSYM
+
+## App packaging
+Sip Safari/*.app
+Sip Safari/*.xcarchive
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+## Swift Package Manager
+Sip Safari/.swiftpm/
+Sip Safari/.build/
+
+## CocoaPods
+Sip Safari/Pods/

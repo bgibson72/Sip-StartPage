@@ -3,6 +3,12 @@
 // ========================================
 
 // ========================================
+// Browser Detection
+// ========================================
+
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+// ========================================
 // Default Data
 // ========================================
 
@@ -554,10 +560,21 @@ function renderSocialLinks() {
     const visibleLinks = settings.socialLinks.filter(link => link.visible && link.url);
     
     if (visibleLinks.length > 0) {
+        const target = settings.linkBehavior === 'new-tab' ? '_blank' : (settings.linkBehavior === 'new-window' ? '_blank' : '_self');
         iconsContainer.innerHTML = visibleLinks.map(link => {
-            const target = settings.linkBehavior === 'new-tab' ? '_blank' : (settings.linkBehavior === 'new-window' ? '_blank' : '_self');
-            return `<a href="${link.url}" target="${target}" title="${link.name}" class="social-icon"><i class="${link.icon}"></i></a>`;
+            return `<a href="${link.url}" target="${target}" title="${link.name}" class="social-icon" data-link-behavior="${settings.linkBehavior}"><i class="${link.icon}"></i></a>`;
         }).join('');
+        
+        // Add click handlers for social links
+        iconsContainer.querySelectorAll('.social-icon').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const behavior = this.getAttribute('data-link-behavior');
+                if (behavior === 'new-tab' || behavior === 'new-window') {
+                    e.preventDefault();
+                    window.open(this.href, '_blank', 'noopener,noreferrer');
+                }
+            });
+        });
     } else {
         iconsContainer.innerHTML = '';
     }
@@ -642,7 +659,6 @@ function renderLinksGrid() {
     
     const colorMode = settings.colorMode;
     const linkTarget = settings.linkBehavior === 'new-tab' ? '_blank' : (settings.linkBehavior === 'new-window' ? '_blank' : '_self');
-    const linkFeatures = settings.linkBehavior === 'new-window' ? 'noopener,noreferrer,width=1024,height=768' : '';
     
     linksGrid.innerHTML = categories.map((category, index) => {
         const categoryLinks = links[category.id] || [];
@@ -656,7 +672,7 @@ function renderLinksGrid() {
                 </h2>
                 <div class="links">
                     ${categoryLinks.map(link => `
-                        <a href="${link.url}" class="link-card" target="${linkTarget}" ${linkTarget === '_blank' && linkFeatures ? `onclick="window.open('${link.url}', '_blank', '${linkFeatures}'); return false;"` : ''}>
+                        <a href="${link.url}" class="link-card" target="${linkTarget}" data-link-behavior="${settings.linkBehavior}">
                             <span class="link-icon"><i class="${link.icon || 'fa-solid fa-link'}"></i></span>
                             <span class="link-text">${link.name}</span>
                         </a>
@@ -665,6 +681,18 @@ function renderLinksGrid() {
             </section>
         `;
     }).join('');
+    
+    // Add click handlers for link behavior
+    document.querySelectorAll('.link-card').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const behavior = this.getAttribute('data-link-behavior');
+            if (behavior === 'new-tab' || behavior === 'new-window') {
+                e.preventDefault();
+                window.open(this.href, '_blank', 'noopener,noreferrer');
+            }
+            // 'same' uses target="_self" (default browser behavior)
+        });
+    });
     
     updateGridLayout();
 }
@@ -1351,6 +1379,18 @@ function init() {
     weatherElement = document.getElementById('weather');
     quoteElement = document.getElementById('quote');
     linksGrid = document. getElementById('links-grid');
+    
+    // Hide "New Window" option on Safari (it behaves the same as "New Tab")
+    if (isSafari) {
+        const newWindowBtn = document.getElementById('new-window-btn');
+        if (newWindowBtn) {
+            newWindowBtn.style.display = 'none';
+            // If current setting is 'new-window', change it to 'new-tab'
+            if (settings.linkBehavior === 'new-window') {
+                saveSettings('linkBehavior', 'new-tab');
+            }
+        }
+    }
     
     // Render dynamic content
     renderLinksGrid();

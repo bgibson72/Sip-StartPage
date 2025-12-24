@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sip",
   "version": "1.1.1",
-  "description": "A cozy new tab page with 9 beautiful color schemes, quick links, social links, backup/restore, and extensive customization",
+  "description": "A cozy new tab page with 9 beautiful color schemes, quick links, and extensive customization",
   "author": "Bryan Gibson",
 
   "browser_specific_settings": {
@@ -26,9 +26,7 @@
     "128": "icons/icon128.png"
   },
 
-  "permissions": [
-    "search"
-  ],
+  "permissions": [],
 
   "web_accessible_resources": [
     {

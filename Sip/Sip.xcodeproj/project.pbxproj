@@ -1,0 +1,675 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FF1606BB2EF5E63E004DD933 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1606BA2EF5E63E004DD933 /* AppDelegate.swift */; };
+		FF1606BF2EF5E63E004DD933 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FF1606BD2EF5E63E004DD933 /* Main.html */; };
+		FF1606C12EF5E63E004DD933 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FF1606C02EF5E63E004DD933 /* Icon.png */; };
+		FF1606C32EF5E63E004DD933 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = FF1606C22EF5E63E004DD933 /* Style.css */; };
+		FF1606C52EF5E63E004DD933 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = FF1606C42EF5E63E004DD933 /* Script.js */; };
+		FF1606C72EF5E63E004DD933 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1606C62EF5E63E004DD933 /* ViewController.swift */; };
+		FF1606CA2EF5E63E004DD933 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF1606C82EF5E63E004DD933 /* Main.storyboard */; };
+		FF1606CC2EF5E643004DD933 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF1606CB2EF5E643004DD933 /* Assets.xcassets */; };
+		FF1606D32EF5E644004DD933 /* Sip Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FF1606D22EF5E644004DD933 /* Sip Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FF1606D82EF5E644004DD933 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF1606D72EF5E644004DD933 /* SafariWebExtensionHandler.swift */; };
+		FF1606F62EF5E644004DD933 /* screenshots in Resources */ = {isa = PBXBuildFile; fileRef = FF1606E42EF5E644004DD933 /* screenshots */; };
+		FF1606F72EF5E644004DD933 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = FF1606E52EF5E644004DD933 /* index.html */; };
+		FF1606F82EF5E644004DD933 /* APP-STORE-CHECKLIST.md in Resources */ = {isa = PBXBuildFile; fileRef = FF1606E62EF5E644004DD933 /* APP-STORE-CHECKLIST.md */; };
+		FF1606F92EF5E644004DD933 /* PRIVACY.md in Resources */ = {isa = PBXBuildFile; fileRef = FF1606E72EF5E644004DD933 /* PRIVACY.md */; };
+		FF1606FA2EF5E644004DD933 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = FF1606E82EF5E644004DD933 /* README.md */; };
+		FF1606FB2EF5E644004DD933 /* SAFARI-DISTRIBUTION.md in Resources */ = {isa = PBXBuildFile; fileRef = FF1606E92EF5E644004DD933 /* SAFARI-DISTRIBUTION.md */; };
+		FF1606FC2EF5E644004DD933 /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = FF1606EA2EF5E644004DD933 /* script.js */; };
+		FF1606FD2EF5E644004DD933 /* sip_preview.png in Resources */ = {isa = PBXBuildFile; fileRef = FF1606EB2EF5E644004DD933 /* sip_preview.png */; };
+		FF1606FE2EF5E644004DD933 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = FF1606EC2EF5E644004DD933 /* icons */; };
+		FF1606FF2EF5E644004DD933 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = FF1606ED2EF5E644004DD933 /* style.css */; };
+		FF1607002EF5E644004DD933 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = FF1606EE2EF5E644004DD933 /* manifest.json */; };
+		FF1607012EF5E644004DD933 /* SAFARI-QUICKSTART.md in Resources */ = {isa = PBXBuildFile; fileRef = FF1606EF2EF5E644004DD933 /* SAFARI-QUICKSTART.md */; };
+		FF1607022EF5E644004DD933 /* Sip in Resources */ = {isa = PBXBuildFile; fileRef = FF1606F02EF5E644004DD933 /* Sip */; };
+		FF1607032EF5E644004DD933 /* build-safari.sh in Resources */ = {isa = PBXBuildFile; fileRef = FF1606F12EF5E644004DD933 /* build-safari.sh */; };
+		FF1607042EF5E644004DD933 /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = FF1606F22EF5E644004DD933 /* fonts */; };
+		FF1607052EF5E644004DD933 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = FF1606F32EF5E644004DD933 /* assets */; };
+		FF1607062EF5E644004DD933 /* START-HERE.txt in Resources */ = {isa = PBXBuildFile; fileRef = FF1606F42EF5E644004DD933 /* START-HERE.txt */; };
+		FF1607072EF5E644004DD933 /* SAFARI-SETUP-SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = FF1606F52EF5E644004DD933 /* SAFARI-SETUP-SUMMARY.md */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FF1606D42EF5E644004DD933 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF1606AF2EF5E63D004DD933 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FF1606D12EF5E644004DD933;
+			remoteInfo = "Sip Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FF1606DF2EF5E644004DD933 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FF1606D32EF5E644004DD933 /* Sip Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FF1606B72EF5E63E004DD933 /* Sip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF1606BA2EF5E63E004DD933 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FF1606BE2EF5E63E004DD933 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		FF1606C02EF5E63E004DD933 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		FF1606C22EF5E63E004DD933 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		FF1606C42EF5E63E004DD933 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		FF1606C62EF5E63E004DD933 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FF1606C92EF5E63E004DD933 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FF1606CB2EF5E643004DD933 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FF1606CD2EF5E643004DD933 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF1606D22EF5E644004DD933 /* Sip Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Sip Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF1606D72EF5E644004DD933 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		FF1606D92EF5E644004DD933 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF1606E42EF5E644004DD933 /* screenshots */ = {isa = PBXFileReference; lastKnownFileType = folder; name = screenshots; path = ../../screenshots; sourceTree = "<group>"; };
+		FF1606E52EF5E644004DD933 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = index.html; path = ../../index.html; sourceTree = "<group>"; };
+		FF1606E62EF5E644004DD933 /* APP-STORE-CHECKLIST.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = "APP-STORE-CHECKLIST.md"; path = "../../APP-STORE-CHECKLIST.md"; sourceTree = "<group>"; };
+		FF1606E72EF5E644004DD933 /* PRIVACY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = PRIVACY.md; path = ../../PRIVACY.md; sourceTree = "<group>"; };
+		FF1606E82EF5E644004DD933 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
+		FF1606E92EF5E644004DD933 /* SAFARI-DISTRIBUTION.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = "SAFARI-DISTRIBUTION.md"; path = "../../SAFARI-DISTRIBUTION.md"; sourceTree = "<group>"; };
+		FF1606EA2EF5E644004DD933 /* script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = script.js; path = ../../script.js; sourceTree = "<group>"; };
+		FF1606EB2EF5E644004DD933 /* sip_preview.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = sip_preview.png; path = ../../sip_preview.png; sourceTree = "<group>"; };
+		FF1606EC2EF5E644004DD933 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = ../../icons; sourceTree = "<group>"; };
+		FF1606ED2EF5E644004DD933 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = style.css; path = ../../style.css; sourceTree = "<group>"; };
+		FF1606EE2EF5E644004DD933 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../manifest.json; sourceTree = "<group>"; };
+		FF1606EF2EF5E644004DD933 /* SAFARI-QUICKSTART.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = "SAFARI-QUICKSTART.md"; path = "../../SAFARI-QUICKSTART.md"; sourceTree = "<group>"; };
+		FF1606F02EF5E644004DD933 /* Sip */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sip; sourceTree = SOURCE_ROOT; };
+		FF1606F12EF5E644004DD933 /* build-safari.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = "build-safari.sh"; path = "../../build-safari.sh"; sourceTree = "<group>"; };
+		FF1606F22EF5E644004DD933 /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fonts; path = ../../fonts; sourceTree = "<group>"; };
+		FF1606F32EF5E644004DD933 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../assets; sourceTree = "<group>"; };
+		FF1606F42EF5E644004DD933 /* START-HERE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "START-HERE.txt"; path = "../../START-HERE.txt"; sourceTree = "<group>"; };
+		FF1606F52EF5E644004DD933 /* SAFARI-SETUP-SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = "SAFARI-SETUP-SUMMARY.md"; path = "../../SAFARI-SETUP-SUMMARY.md"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FF1606B42EF5E63E004DD933 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF1606CF2EF5E644004DD933 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FF1606AE2EF5E63D004DD933 = {
+			isa = PBXGroup;
+			children = (
+				FF1606B92EF5E63E004DD933 /* Sip */,
+				FF1606D62EF5E644004DD933 /* Sip Extension */,
+				FF1606B82EF5E63E004DD933 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF1606B82EF5E63E004DD933 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FF1606B72EF5E63E004DD933 /* Sip.app */,
+				FF1606D22EF5E644004DD933 /* Sip Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF1606B92EF5E63E004DD933 /* Sip */ = {
+			isa = PBXGroup;
+			children = (
+				FF1606BA2EF5E63E004DD933 /* AppDelegate.swift */,
+				FF1606C62EF5E63E004DD933 /* ViewController.swift */,
+				FF1606C82EF5E63E004DD933 /* Main.storyboard */,
+				FF1606CB2EF5E643004DD933 /* Assets.xcassets */,
+				FF1606CD2EF5E643004DD933 /* Info.plist */,
+				FF1606BC2EF5E63E004DD933 /* Resources */,
+			);
+			path = Sip;
+			sourceTree = "<group>";
+		};
+		FF1606BC2EF5E63E004DD933 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FF1606BD2EF5E63E004DD933 /* Main.html */,
+				FF1606C02EF5E63E004DD933 /* Icon.png */,
+				FF1606C22EF5E63E004DD933 /* Style.css */,
+				FF1606C42EF5E63E004DD933 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		FF1606D62EF5E644004DD933 /* Sip Extension */ = {
+			isa = PBXGroup;
+			children = (
+				FF1606E32EF5E644004DD933 /* Resources */,
+				FF1606D72EF5E644004DD933 /* SafariWebExtensionHandler.swift */,
+				FF1606D92EF5E644004DD933 /* Info.plist */,
+			);
+			path = "Sip Extension";
+			sourceTree = "<group>";
+		};
+		FF1606E32EF5E644004DD933 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FF1606E42EF5E644004DD933 /* screenshots */,
+				FF1606E52EF5E644004DD933 /* index.html */,
+				FF1606E62EF5E644004DD933 /* APP-STORE-CHECKLIST.md */,
+				FF1606E72EF5E644004DD933 /* PRIVACY.md */,
+				FF1606E82EF5E644004DD933 /* README.md */,
+				FF1606E92EF5E644004DD933 /* SAFARI-DISTRIBUTION.md */,
+				FF1606EA2EF5E644004DD933 /* script.js */,
+				FF1606EB2EF5E644004DD933 /* sip_preview.png */,
+				FF1606EC2EF5E644004DD933 /* icons */,
+				FF1606ED2EF5E644004DD933 /* style.css */,
+				FF1606EE2EF5E644004DD933 /* manifest.json */,
+				FF1606EF2EF5E644004DD933 /* SAFARI-QUICKSTART.md */,
+				FF1606F02EF5E644004DD933 /* Sip */,
+				FF1606F12EF5E644004DD933 /* build-safari.sh */,
+				FF1606F22EF5E644004DD933 /* fonts */,
+				FF1606F32EF5E644004DD933 /* assets */,
+				FF1606F42EF5E644004DD933 /* START-HERE.txt */,
+				FF1606F52EF5E644004DD933 /* SAFARI-SETUP-SUMMARY.md */,
+			);
+			name = Resources;
+			path = "Sip Extension";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FF1606B62EF5E63E004DD933 /* Sip */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF1606E02EF5E644004DD933 /* Build configuration list for PBXNativeTarget "Sip" */;
+			buildPhases = (
+				FF1606B32EF5E63E004DD933 /* Sources */,
+				FF1606B42EF5E63E004DD933 /* Frameworks */,
+				FF1606B52EF5E63E004DD933 /* Resources */,
+				FF1606DF2EF5E644004DD933 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FF1606D52EF5E644004DD933 /* PBXTargetDependency */,
+			);
+			name = Sip;
+			packageProductDependencies = (
+			);
+			productName = Sip;
+			productReference = FF1606B72EF5E63E004DD933 /* Sip.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FF1606D12EF5E644004DD933 /* Sip Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF1606DC2EF5E644004DD933 /* Build configuration list for PBXNativeTarget "Sip Extension" */;
+			buildPhases = (
+				FF1606CE2EF5E644004DD933 /* Sources */,
+				FF1606CF2EF5E644004DD933 /* Frameworks */,
+				FF1606D02EF5E644004DD933 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Sip Extension";
+			packageProductDependencies = (
+			);
+			productName = "Sip Extension";
+			productReference = FF1606D22EF5E644004DD933 /* Sip Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FF1606AF2EF5E63D004DD933 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					FF1606B62EF5E63E004DD933 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					FF1606D12EF5E644004DD933 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+				};
+			};
+			buildConfigurationList = FF1606B22EF5E63D004DD933 /* Build configuration list for PBXProject "Sip" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FF1606AE2EF5E63D004DD933;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FF1606B82EF5E63E004DD933 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FF1606B62EF5E63E004DD933 /* Sip */,
+				FF1606D12EF5E644004DD933 /* Sip Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FF1606B52EF5E63E004DD933 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF1606C12EF5E63E004DD933 /* Icon.png in Resources */,
+				FF1606CA2EF5E63E004DD933 /* Main.storyboard in Resources */,
+				FF1606C52EF5E63E004DD933 /* Script.js in Resources */,
+				FF1606BF2EF5E63E004DD933 /* Main.html in Resources */,
+				FF1606CC2EF5E643004DD933 /* Assets.xcassets in Resources */,
+				FF1606C32EF5E63E004DD933 /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF1606D02EF5E644004DD933 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF1606FC2EF5E644004DD933 /* script.js in Resources */,
+				FF1607012EF5E644004DD933 /* SAFARI-QUICKSTART.md in Resources */,
+				FF1606F62EF5E644004DD933 /* screenshots in Resources */,
+				FF1607072EF5E644004DD933 /* SAFARI-SETUP-SUMMARY.md in Resources */,
+				FF1606F82EF5E644004DD933 /* APP-STORE-CHECKLIST.md in Resources */,
+				FF1606FE2EF5E644004DD933 /* icons in Resources */,
+				FF1606FA2EF5E644004DD933 /* README.md in Resources */,
+				FF1607042EF5E644004DD933 /* fonts in Resources */,
+				FF1607002EF5E644004DD933 /* manifest.json in Resources */,
+				FF1607022EF5E644004DD933 /* Sip in Resources */,
+				FF1607052EF5E644004DD933 /* assets in Resources */,
+				FF1606F72EF5E644004DD933 /* index.html in Resources */,
+				FF1606FB2EF5E644004DD933 /* SAFARI-DISTRIBUTION.md in Resources */,
+				FF1607062EF5E644004DD933 /* START-HERE.txt in Resources */,
+				FF1606FF2EF5E644004DD933 /* style.css in Resources */,
+				FF1606F92EF5E644004DD933 /* PRIVACY.md in Resources */,
+				FF1606FD2EF5E644004DD933 /* sip_preview.png in Resources */,
+				FF1607032EF5E644004DD933 /* build-safari.sh in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FF1606B32EF5E63E004DD933 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF1606C72EF5E63E004DD933 /* ViewController.swift in Sources */,
+				FF1606BB2EF5E63E004DD933 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF1606CE2EF5E644004DD933 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FF1606D82EF5E644004DD933 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FF1606D52EF5E644004DD933 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FF1606D12EF5E644004DD933 /* Sip Extension */;
+			targetProxy = FF1606D42EF5E644004DD933 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FF1606BD2EF5E63E004DD933 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FF1606BE2EF5E63E004DD933 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		FF1606C82EF5E63E004DD933 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FF1606C92EF5E63E004DD933 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FF1606DA2EF5E644004DD933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FF1606DB2EF5E644004DD933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		FF1606DD2EF5E644004DD933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47RGG575KA;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Sip Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Sip Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vegvisirdesign.sip-startpage.sip-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FF1606DE2EF5E644004DD933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47RGG575KA;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Sip Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Sip Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vegvisirdesign.sip-startpage.sip-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FF1606E12EF5E644004DD933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47RGG575KA;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sip/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sip;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vegvisirdesign.sip-startpage";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FF1606E22EF5E644004DD933 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 47RGG575KA;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sip/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sip;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.1;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.vegvisirdesign.sip-startpage";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FF1606B22EF5E63D004DD933 /* Build configuration list for PBXProject "Sip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF1606DA2EF5E644004DD933 /* Debug */,
+				FF1606DB2EF5E644004DD933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF1606DC2EF5E644004DD933 /* Build configuration list for PBXNativeTarget "Sip Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF1606DD2EF5E644004DD933 /* Debug */,
+				FF1606DE2EF5E644004DD933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF1606E02EF5E644004DD933 /* Build configuration list for PBXNativeTarget "Sip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF1606E12EF5E644004DD933 /* Debug */,
+				FF1606E22EF5E644004DD933 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FF1606AF2EF5E63D004DD933 /* Project object */;
+}

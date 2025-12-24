@@ -201,7 +201,8 @@ Sip now includes 9 beautiful color schemes, each with both light and dark varian
 ## 🔒 Privacy & Permissions
 
 **Required Permissions:**
-- `search` - To integrate with your browser's default search engine (Chrome only)
+- Chrome/Firefox: `search` - To integrate with your browser's default search engine
+- Safari: None - No special permissions required
 
 **What We DON'T Do:**
 - No data collection or analytics
@@ -293,8 +294,19 @@ Each screenshot demonstrates the glassmorphism effects, customizable categories,
 
 - **Chrome Web Store** - Coming soon!
 - **Firefox Add-ons** - Coming soon!
+- **Safari Extension** - [Build & install instructions](SAFARI-QUICKSTART.md)
 
 Once published, simply install from your browser's extension store and Sip will replace your new tab page.
+
+### Safari Extension
+
+For Safari users, Sip can be built and installed as a native Safari Extension:
+
+1. Open the Xcode project: `open "Sip Safari/Sip Safari.xcodeproj"`
+2. Build and run the project (⌘ + R)
+3. Enable in Safari → Settings → Extensions
+4. See [SAFARI-QUICKSTART.md](SAFARI-QUICKSTART.md) for detailed instructions
+5. For App Store distribution, see [SAFARI-DISTRIBUTION.md](SAFARI-DISTRIBUTION.md)
 
 ---
 
