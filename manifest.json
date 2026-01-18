@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Sip",
   "version": "1.4.0",
   "description": "A cozy new tab page with 9 beautiful color schemes, quick links, bookmark import, and extensive customization",
