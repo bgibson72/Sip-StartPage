@@ -2420,10 +2420,15 @@ kbd {
     #search {
         font-size: 1rem;
         min-height: 44px;
+        width: 100%;
     }
     
     .search-engines {
-        display: none;
+        display: none !important;
+    }
+    
+    .engine {
+        display: none !important;
     }
     
     .search-engine-grid {
