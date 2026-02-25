@@ -1078,6 +1078,16 @@ function isKanji(ch) {
     return (code >= 0x4E00 && code <= 0x9FAF) || (code >= 0x3400 && code <= 0x4DBF);
 }
 
+// Historical kana → modern reading substitutions (e.g. 替はる → かわる)
+const HISTORICAL_KANA = { 'は': 'わ', 'ひ': 'い', 'ふ': 'う', 'へ': 'え', 'ほ': 'お' };
+
+function findAnchor(anchor, reading, from) {
+    const idx = reading.indexOf(anchor, from);
+    if (idx !== -1) return idx;
+    const modern = HISTORICAL_KANA[anchor];
+    return modern ? reading.indexOf(modern, from) : -1;
+}
+
 function alignFurigana(text, reading) {
     const result = [];
     let t = 0, r = 0;
@@ -1088,7 +1098,7 @@ function alignFurigana(text, reading) {
             const kanji = text.slice(kStart, t);
             let kanjiReading;
             if (t < text.length) {
-                const rEnd = reading.indexOf(text[t], r);
+                const rEnd = findAnchor(text[t], reading, r);
                 kanjiReading = rEnd === -1 ? reading.slice(r) : reading.slice(r, rEnd);
                 r = rEnd === -1 ? reading.length : rEnd;
             } else {
@@ -1097,7 +1107,13 @@ function alignFurigana(text, reading) {
             }
             result.push({ kanji, reading: kanjiReading });
         } else {
-            result.push({ text: text[t] });
+            const readingChar = r < reading.length ? reading[r] : null;
+            if (readingChar && readingChar !== text[t]) {
+                // Historical kana mismatch (e.g. は read as わ): show furigana over the kana
+                result.push({ kanji: text[t], reading: readingChar });
+            } else {
+                result.push({ text: text[t] });
+            }
             t++;
             r++;
         }
@@ -1830,7 +1846,7 @@ function initSettings() {
     if (addHaikuBtn) {
         addHaikuBtn.addEventListener('click', () => {
             if (!settings.haiku) settings.haiku = [];
-            if (settings.haiku.length < 50) {
+            if (settings.haiku.length < 200) {
                 settings.haiku.push({ text: '', furigana: '', author: '' });
                 saveSettings('haiku', settings.haiku);
                 renderHaikuSettings();
@@ -2462,7 +2478,7 @@ function renderHaikuSettings() {
                     <span class="haiku-field-label">俳句</span>
                     <div class="haiku-text-group">
                         <input class="haiku-input" data-index="${index}" data-field="text" placeholder="古池や　蛙飛び込む　水の音" value="${h.text || ''}">
-                        <input class="haiku-input haiku-furigana" data-index="${index}" data-field="furigana" placeholder="ふりがな" value="${h.furigana || ''}">
+                        <input class="haiku-input haiku-furigana" data-index="${index}" data-field="furigana" placeholder="ふるいけや　かわずとびこむ　みずのおと" value="${h.furigana || ''}">
                     </div>
                 </div>
                 <div class="haiku-field-row haiku-inline-row">
@@ -2487,13 +2503,16 @@ function renderHaikuSettings() {
         </div>
     `).join('');
 
-    if (addBtn) addBtn.disabled = list.length >= 50;
+    if (addBtn) addBtn.disabled = list.length >= 200;
+
+    updateHaikuStats();
 
     function saveField(e) {
         const index = parseInt(e.target.dataset.index);
         settings.haiku[index][e.target.dataset.field] = e.target.value;
         saveSettings('haiku', settings.haiku);
         updateHaiku();
+        updateHaikuStats();
     }
 
     container.querySelectorAll('input[data-field], textarea[data-field]').forEach(el => el.addEventListener('input', saveField));
@@ -2510,6 +2529,24 @@ function renderHaikuSettings() {
             }
         });
     });
+}
+
+function updateHaikuStats() {
+    const el = document.getElementById('haiku-stats');
+    if (!el) return;
+    const list = settings.haiku || haikuData || [];
+    const counts = { '春': 0, '夏': 0, '秋': 0, '冬': 0 };
+    let nashi = 0;
+    for (const h of list) {
+        if (h.kigo_season && counts[h.kigo_season] !== undefined) counts[h.kigo_season]++;
+        else nashi++;
+    }
+    const seasonParts = ['春', '夏', '秋', '冬']
+        .filter(s => counts[s] > 0)
+        .map(s => `<span class="haiku-stat-pill">${s} ${counts[s]}</span>`)
+        .join('');
+    const nashiPart = nashi > 0 ? `<span class="haiku-stat-pill haiku-stat-nashi">無季 ${nashi}</span>` : '';
+    el.innerHTML = `<span class="haiku-stat-total">${list.length} 俳句</span>${seasonParts}${nashiPart}`;
 }
 
 function updateFooterSectionVisibility() {

@@ -1612,6 +1612,31 @@ body {
     min-height: 38px;
 }
 
+.haiku-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    padding: 0.35rem 0;
+    font-size: 0.75rem;
+    color: var(--subtext1);
+}
+
+.haiku-stat-total {
+    margin-right: 0.25rem;
+    font-weight: 500;
+}
+
+.haiku-stat-pill {
+    background: var(--surface1);
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+}
+
+.haiku-stat-nashi {
+    color: var(--subtext0);
+}
+
 .haiku-inline-row .haiku-field-label {
     min-width: auto;
 }
