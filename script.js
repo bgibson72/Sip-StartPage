@@ -131,6 +131,7 @@ function loadSettings() {
         colorScheme: 'catppuccin',
         theme: 'dark',
         colorMode: 'multi',
+        font: 'jetbrains-mono',
         timeFormat: '12',
         showSeconds: 'false',
         tempUnit: 'F',
@@ -143,6 +144,7 @@ function loadSettings() {
         openWeatherApiKey: '',
         linkBehavior: 'same',
         showKeyboardHints: mobile ? 'false' : 'true',
+        keyboardHintsPosition: 'below',
         showCredits: 'true',
         density: mobile ? 'compact' : 'comfy',
         iconOnlyMode: 'false',
@@ -152,8 +154,6 @@ function loadSettings() {
         footerCenter: mobile ? 'weather' : 'blank',
         footerRight: mobile ? 'blank' : 'quotes',
         footerPinBottom: 'false',
-        font: 'jetbrains-mono',
-        keyboardHintsPosition: 'below',
         socialLinks: [],
         quotes: [
             '"The only way to do great work is to love what you do." - Steve Jobs',
@@ -179,6 +179,7 @@ function loadSettings() {
     return {
         userName: localStorage.getItem('userName') ??  defaults.userName,
         colorScheme: localStorage.getItem('colorScheme') ?? defaults.colorScheme,
+        font: localStorage.getItem('font') ?? defaults.font,
         theme: localStorage.getItem('theme') ?? defaults.theme,
         colorMode: localStorage.getItem('colorMode') ?? defaults.colorMode,
         timeFormat: localStorage.getItem('timeFormat') ?? defaults.timeFormat,
@@ -193,6 +194,7 @@ function loadSettings() {
         openWeatherApiKey: localStorage.getItem('openWeatherApiKey') ??  defaults.openWeatherApiKey,
         linkBehavior: localStorage.getItem('linkBehavior') ?? defaults.linkBehavior,
         showKeyboardHints: localStorage.getItem('showKeyboardHints') ?? defaults.showKeyboardHints,
+        keyboardHintsPosition: localStorage.getItem('keyboardHintsPosition') ?? defaults.keyboardHintsPosition,
         showCredits: localStorage.getItem('showCredits') ?? defaults.showCredits,
         density: localStorage.getItem('density') ?? defaults.density,
         iconOnlyMode: localStorage.getItem('iconOnlyMode') ?? defaults.iconOnlyMode,
@@ -202,8 +204,6 @@ function loadSettings() {
         footerCenter: localStorage.getItem('footerCenter') ?? defaults.footerCenter,
         footerRight: localStorage.getItem('footerRight') ?? defaults.footerRight,
         footerPinBottom: localStorage.getItem('footerPinBottom') ?? defaults.footerPinBottom,
-    font: localStorage.getItem('font') ?? defaults.font,
-    keyboardHintsPosition: localStorage.getItem('keyboardHintsPosition') ?? defaults.keyboardHintsPosition,
         socialLinks: JSON.parse(localStorage.getItem('socialLinks')) ?? defaults.socialLinks,
         quotes: JSON.parse(localStorage.getItem('quotes')) ?? defaults.quotes,
         haiku: JSON.parse(localStorage.getItem('haiku')) ?? null,
@@ -259,6 +259,7 @@ let settings = loadSettings();
 let categories = loadCategories();
 let links = loadLinks();
 let currentEngine = settings.preferredEngine;
+let weatherApiState = settings.openWeatherApiKey ? 'pending' : 'none'; // 'none' | 'pending' | 'ok' | 'error'
 
 // ========================================
 // Theme Management
@@ -814,6 +815,21 @@ function applyCreditsVisibility() {
     if (credits) credits.style.display = settings.showCredits === 'false' ? 'none' : '';
 }
 
+function updateWeatherApiStatus() {
+    const el = document.getElementById('weather-api-status');
+    if (!el) return;
+    if (weatherApiState === 'ok') {
+        el.className = 'setting-description weather-api-status ok';
+        el.innerHTML = '<i class="fa-solid fa-check"></i> Live weather enabled';
+    } else if (weatherApiState === 'error') {
+        el.className = 'setting-description weather-api-status warning';
+        el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Request failed — check key and location';
+    } else if (weatherApiState === 'none') {
+        el.className = 'setting-description weather-api-status warning';
+        el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> No API key — showing demo data';
+    }
+}
+
 const fontFamilyMap = {
     'jetbrains-mono': "'JetBrains Mono'",
     'fira-code': "'Fira Code'",
@@ -908,9 +924,13 @@ async function fetchWeather(query) {
         }
 
         weatherElement.textContent = `${temp}${tempUnit} ${condition}`;
+        weatherApiState = 'ok';
+        updateWeatherApiStatus();
+        weatherElement.parentElement?.querySelector('.weather-demo-badge')?.remove();
     } catch (err) {
         console.error('Weather fetch error:', err);
-        // Fall back to mock weather on error
+        weatherApiState = 'error';
+        updateWeatherApiStatus();
         showMockWeather();
     }
 }
@@ -948,6 +968,13 @@ function showMockWeather() {
         const iconElement = widgetElement.querySelector('.widget-icon');
         if (iconElement) {
             iconElement.innerHTML = `<i class="fa-solid ${weather.icon}"></i>`;
+        }
+        if (!widgetElement.querySelector('.weather-demo-badge')) {
+            const badge = document.createElement('span');
+            badge.className = 'weather-demo-badge';
+            badge.title = 'Showing demo data · Add an API key in Settings → Widgets';
+            badge.textContent = 'demo';
+            widgetElement.appendChild(badge);
         }
     }
 }
@@ -1058,7 +1085,7 @@ function showMockForecast() {
         return forecast;
     });
 
-    renderForecastWidget(forecasts, tempUnit, false);
+    renderForecastWidget(forecasts, tempUnit, true);
 }
 
 function renderForecastWidget(forecasts, unit, isMock = false) {
@@ -1100,6 +1127,20 @@ function renderForecastWidget(forecasts, unit, isMock = false) {
     }).join('');
 
     forecastWidget.innerHTML = `<div class="forecast-days">${forecastHTML}</div>`;
+
+    const forecastDays = forecastWidget.querySelector('.forecast-days');
+    let badge = forecastDays.querySelector('.weather-demo-badge');
+    if (isMock) {
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'weather-demo-badge';
+            badge.title = 'Showing demo data · Add an API key in Settings → Widgets';
+            badge.textContent = 'demo';
+            forecastDays.appendChild(badge);
+        }
+    } else {
+        badge?.remove();
+    }
 }
 
 // ========================================
@@ -1652,12 +1693,12 @@ function initSettings() {
                 renderLinksGrid();
             } else if (setting === 'showKeyboardHints') {
                 updateKeyboardHints();
+            } else if (setting === 'keyboardHintsPosition') {
+                applyKeyboardHintsPosition();
             } else if (setting === 'showCredits') {
                 applyCreditsVisibility();
             } else if (setting === 'footerPinBottom') {
                 applyFooterPinBottom();
-            } else if (setting === 'keyboardHintsPosition') {
-                applyKeyboardHintsPosition();
             } else if (setting === 'showSearchBar') {
                 applySearchVisibility();
             } else if (setting === 'headerLeft' || setting === 'headerRight') {
@@ -1749,6 +1790,14 @@ function initSettings() {
         });
     }
 
+    const fontSelect = document.getElementById('setting-font');
+    if (fontSelect) {
+        fontSelect.addEventListener('change', (e) => {
+            saveSettings('font', e.target.value);
+            applyFont(e.target.value);
+        });
+    }
+
     // Custom color pickers - sync between color input and hex input
     const customColorInputs = [
         { color: 'custom-primary', hex: 'custom-primary-hex', prop: 'primary' },
@@ -1795,18 +1844,12 @@ function initSettings() {
     }
 
     // OpenWeather API key input handler
-    const fontSelect = document.getElementById('setting-font');
-    if (fontSelect) {
-        fontSelect.addEventListener('change', (e) => {
-            saveSettings('font', e.target.value);
-            applyFont(e.target.value);
-        });
-    }
-
     const apiKeyInput = document.getElementById('setting-weather-api-key');
     if (apiKeyInput) {
         apiKeyInput.addEventListener('input', (e) => {
             saveSettings('openWeatherApiKey', e.target.value.trim());
+            weatherApiState = settings.openWeatherApiKey ? 'pending' : 'none';
+            updateWeatherApiStatus();
         });
 
         // Update weather when user finishes typing (on blur)
@@ -1884,6 +1927,8 @@ function initSettings() {
                 settings.quotes.push('"Your new quote here" - Author');
                 saveSettings('quotes', settings.quotes);
                 renderQuotesSettings();
+                const list = document.getElementById('quotes-list');
+                if (list) list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         });
     }
@@ -1897,6 +1942,8 @@ function initSettings() {
                 settings.haiku.push({ text: '', furigana: '', author: '' });
                 saveSettings('haiku', settings.haiku);
                 renderHaikuSettings();
+                const list = document.getElementById('haiku-list');
+                if (list) list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         });
     }
@@ -1961,18 +2008,12 @@ function populateSettingsUI() {
     }
 
     // Populate OpenWeather API key input
-    const fontSelect = document.getElementById('setting-font');
-    if (fontSelect) {
-        fontSelect.addEventListener('change', (e) => {
-            saveSettings('font', e.target.value);
-            applyFont(e.target.value);
-        });
-    }
-
     const apiKeyInput = document.getElementById('setting-weather-api-key');
     if (apiKeyInput) {
         apiKeyInput.value = settings.openWeatherApiKey;
     }
+
+    updateWeatherApiStatus();
 
     // Populate preferred columns dropdown
     const preferredColumnsSelect = document.getElementById('setting-preferred-columns');

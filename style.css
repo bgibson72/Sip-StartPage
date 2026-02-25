@@ -22,11 +22,11 @@
 
 /* CSS Custom Properties - Color Palette */
 :root {
+    --font-mono: 'JetBrains Mono';
+
     /* Animation */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.3s ease;
-    --font-mono: 'JetBrains Mono';
-
     --transition-slow: 0.5s ease;
 
     /* Spacing */
@@ -1246,7 +1246,7 @@ body {
 }
 
 .settings-section-label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--subtext0);
     display: flex;
@@ -1375,6 +1375,14 @@ body {
     color: var(--subtext0);
     line-height: 1.4;
     margin: 0;
+}
+
+.weather-api-status.warning {
+    color: var(--peach);
+}
+
+.weather-api-status.ok {
+    color: var(--green);
 }
 
 .setting-actions {
@@ -2438,6 +2446,21 @@ body {
 .widget-text {
     font-size: 0.85rem;
     color: var(--subtext0);
+}
+
+.weather-demo-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--peach);
+    border: 1px solid var(--peach);
+    border-radius: 3px;
+    padding: 1px 4px;
+    opacity: 0.75;
+    cursor: help;
+    white-space: nowrap;
+    align-self: center;
 }
 
 .quote-widget {
