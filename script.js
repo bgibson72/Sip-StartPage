@@ -151,6 +151,7 @@ function loadSettings() {
         footerLeft: mobile ? 'blank' : 'weather',
         footerCenter: mobile ? 'weather' : 'blank',
         footerRight: mobile ? 'blank' : 'quotes',
+        footerPinBottom: 'false',
         socialLinks: [],
         quotes: [
             '"The only way to do great work is to love what you do." - Steve Jobs',
@@ -198,6 +199,7 @@ function loadSettings() {
         footerLeft: localStorage.getItem('footerLeft') ?? defaults.footerLeft,
         footerCenter: localStorage.getItem('footerCenter') ?? defaults.footerCenter,
         footerRight: localStorage.getItem('footerRight') ?? defaults.footerRight,
+        footerPinBottom: localStorage.getItem('footerPinBottom') ?? defaults.footerPinBottom,
         socialLinks: JSON.parse(localStorage.getItem('socialLinks')) ?? defaults.socialLinks,
         quotes: JSON.parse(localStorage.getItem('quotes')) ?? defaults.quotes,
         haiku: JSON.parse(localStorage.getItem('haiku')) ?? null,
@@ -774,6 +776,7 @@ function renderSearchEngines() {
     // Update keyboard hints
     updateKeyboardHints();
     applyCreditsVisibility();
+    applyFooterPinBottom();
 }
 
 function updateKeyboardHints() {
@@ -803,6 +806,11 @@ function updateKeyboardHints() {
 function applyCreditsVisibility() {
     const credits = document.querySelector('.developer-credits');
     if (credits) credits.style.display = settings.showCredits === 'false' ? 'none' : '';
+}
+
+function applyFooterPinBottom() {
+    const linksGrid = document.getElementById('links-grid');
+    if (linksGrid) linksGrid.classList.toggle('footer-pinned', settings.footerPinBottom === 'true');
 }
 
 // Weather Function (OpenWeather API Integration)
@@ -1614,6 +1622,8 @@ function initSettings() {
                 updateKeyboardHints();
             } else if (setting === 'showCredits') {
                 applyCreditsVisibility();
+            } else if (setting === 'footerPinBottom') {
+                applyFooterPinBottom();
             } else if (setting === 'showSearchBar') {
                 applySearchVisibility();
             } else if (setting === 'headerLeft' || setting === 'headerRight') {

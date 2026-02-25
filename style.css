@@ -1909,6 +1909,11 @@ body {
     margin-bottom: var(--spacing-lg);
 }
 
+.links-grid.footer-pinned {
+    flex-grow: 1;
+    align-content: start;
+}
+
 /* Custom preferred columns */
 .links-grid.grid-custom {
     grid-template-columns: repeat(var(--links-grid-columns, 3), 1fr);
