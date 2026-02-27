@@ -15,8 +15,81 @@ const isMobile = () => {
 };
 
 // ========================================
+// Supported Languages / Locales
+// ========================================
+const LOCALES = {
+    sq: "Shqip",                    // Albanian
+    af: "Afrikaans",                // Afrikaans
+    ar: "العربية",                  // Arabic
+    az: "Azərbaycan dili",          // Azerbaijani
+    eu: "Euskara",                  // Basque
+    be: "Беларуская",               // Belarusian
+    bg: "Български",                // Bulgarian
+    ca: "Català",                   // Catalan
+    zh_cn: "简体中文",              // Chinese (Simplified)
+    zh_tw: "繁體中文",              // Chinese (Traditional)
+    hr: "Hrvatski",                 // Croatian
+    cz: "Čeština",                  // Czech
+    da: "Dansk",                    // Danish
+    nl: "Nederlands",               // Dutch
+    en: "English",                  // English
+    fi: "Suomi",                    // Finnish
+    fr: "Français",                 // French
+    gl: "Galego",                   // Galician
+    de: "Deutsch",                  // German
+    el: "Ελληνικά",                 // Greek
+    he: "עברית",                    // Hebrew
+    hi: "हिन्दी",                      // Hindi
+    hu: "Magyar",                   // Hungarian
+    is: "Íslenska",                 // Icelandic
+    id: "Bahasa Indonesia",         // Indonesian
+    it: "Italiano",                 // Italian
+    ja: "日本語",                   // Japanese
+    kr: "한국어",                   // Korean
+    ku: "Kurdî",                    // Kurdish (Kurmanji)
+    la: "Latviešu",                 // Latvian
+    lt: "Lietuvių",                 // Lithuanian
+    mk: "Македонски",               // Macedonian
+    no: "Norsk",                    // Norwegian
+    fa: "فارسی",                    // Persian (Farsi)
+    pl: "Polski",                   // Polish
+    pt: "Português",                // Portuguese
+    pt_br: "Português (Brasil)",    // Portuguese (Brazil)
+    ro: "Română",                   // Romanian
+    ru: "Русский",                  // Russian
+    sr: "Српски",                   // Serbian
+    sk: "Slovenčina",               // Slovak
+    sl: "Slovenščina",              // Slovenian
+    es: "Español",                  // Spanish
+    sv: "Svenska",                  // Swedish
+    th: "ไทย",                      // Thai
+    tr: "Türkçe",                   // Turkish
+    uk: "Українська",               // Ukrainian
+    vi: "Tiếng Việt",               // Vietnamese
+    zu: "isiZulu"                   // Zulu
+};
+
+// ========================================
 // Default Data
 // ========================================
+
+const defaultLocale = (() => {
+    const lang = (navigator.language || "en").toLowerCase();
+
+    // Chinese special handling
+    if (lang.startsWith("zh")) {
+        return lang.includes("tw") ? "zh_tw" : "zh_cn";
+    }
+
+    // Brazilian Portuguese special handling
+    if (lang.startsWith("pt")) {
+        return lang.includes("br") ? "pt_br" : "pt";
+    }
+
+    // Direct match
+    const base = lang.split("-")[0];
+    return LOCALES[base] ? base : "en";
+})();
 
 const defaultCategories = [
     { id: 'dev', name: 'Development', icon: 'fa-solid fa-code' },
@@ -154,6 +227,7 @@ function loadSettings() {
         footerCenter: mobile ? 'weather' : 'blank',
         footerRight: mobile ? 'blank' : 'quotes',
         footerPinBottom: 'false',
+        locale: defaultLocale,
         socialLinks: [],
         quotes: [
             '"The only way to do great work is to love what you do." - Steve Jobs',
@@ -205,6 +279,7 @@ function loadSettings() {
         footerRight: localStorage.getItem('footerRight') ?? defaults.footerRight,
         footerPinBottom: localStorage.getItem('footerPinBottom') ?? defaults.footerPinBottom,
         socialLinks: JSON.parse(localStorage.getItem('socialLinks')) ?? defaults.socialLinks,
+        locale: localStorage.getItem('locale') ?? defaults.locale,
         quotes: JSON.parse(localStorage.getItem('quotes')) ?? defaults.quotes,
         haiku: JSON.parse(localStorage.getItem('haiku')) ?? null,
         customColors: JSON.parse(localStorage.getItem('customColors') || JSON.stringify(defaults.customColors)),
@@ -668,9 +743,7 @@ function updateDateTime() {
 
     const use12Hour = settings.timeFormat === '12';
     const showSeconds = settings.showSeconds === 'true';
-
-    // TODO: Use browser language or setting override
-    const locale = 'ja-JP';
+    const locale = settings.locale;
 
     const timeString = now.toLocaleTimeString(locale, {
         hour: 'numeric',
@@ -895,7 +968,7 @@ async function fetchWeather(query) {
     try {
         const unit = settings.tempUnit === 'C' ? 'metric' : 'imperial';
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?${query}&appid=${settings.openWeatherApiKey}&units=${unit}&lang=ja`
+            `https://api.openweathermap.org/data/2.5/weather?${query}&appid=${settings.openWeatherApiKey}&units=${unit}&lang=${settings.locale}`
         );
 
         if (!response.ok) {
@@ -999,7 +1072,7 @@ async function fetchForecast(query) {
     try {
         const unit = settings.tempUnit === 'C' ? 'metric' : 'imperial';
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/forecast?${query}&appid=${settings.openWeatherApiKey}&units=${unit}&cnt=40&lang=ja`
+            `https://api.openweathermap.org/data/2.5/forecast?${query}&appid=${settings.openWeatherApiKey}&units=${unit}&cnt=40&lang=${settings.locale}`
         );
 
         if (!response.ok) {
@@ -1034,7 +1107,7 @@ async function fetchForecast(query) {
             }
         }
 
-        renderForecastWidget(dailyForecasts, unit);
+        renderForecastWidget(dailyForecasts);
     } catch (err) {
         console.error('Forecast fetch error:', err);
         showMockForecast();
@@ -1085,27 +1158,16 @@ function showMockForecast() {
         return forecast;
     });
 
-    renderForecastWidget(forecasts, tempUnit, true);
+    renderForecastWidget(forecasts, true);
 }
 
-function renderForecastWidget(forecasts, unit, isMock = false) {
+function renderForecastWidget(forecasts, isMock = false) {
     const forecastWidget = document.querySelector('.forecast-widget');
     if (!forecastWidget) return;
 
-    const tempUnit = unit === 'metric' ? '°C' : '°F';
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const jDayNames = ['日', '月', '火', '水', '木', '金', '土'];
-
     const forecastHTML = forecasts.map((forecast, index) => {
-        let dayName;
-        if (forecast.date) {
-            dayName = dayNames[forecast.date.getDay()];
-        } else {
-            // Fallback if no date (starting from tomorrow)
-            dayName = dayNames[(new Date().getDay() + index + 1) % 7];
-        }
-
-        dayName = jDayNames[dayNames.indexOf(dayName)];
+        const date = forecast.date ?? new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000);
+        const dayName = new Intl.DateTimeFormat(settings.locale, { weekday: 'short' }).format(date);
 
         let iconHTML;
         if (isMock) {
@@ -1960,6 +2022,17 @@ function initSettings() {
         });
     }
 
+    // Locale events
+    const localeSelect = document.getElementById('language-select');
+    if (localeSelect) {
+        localeSelect.addEventListener('change', (e) => {
+            saveSettings('locale', e.target.value);
+            // Re-fetch weather
+            updateWeather();
+            updateForecast();
+        });
+    }
+
     updateToggleStates();
 }
 
@@ -2030,6 +2103,15 @@ function populateSettingsUI() {
             })
             .join('');
         fontSelect.value = settings.font;
+    }
+
+    // Locale selector
+    const localeSelect = document.getElementById('language-select');
+    if (localeSelect) {
+        localeSelect.innerHTML = Object.entries(LOCALES)
+            .map(([code, label]) => `<option value="${code}">${label}</option>`)
+            .join('');
+        localeSelect.value = settings.locale || defaultLocale || 'en';
     }
 
     // Populate search engine checkboxes

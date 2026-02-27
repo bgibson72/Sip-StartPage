@@ -1302,7 +1302,6 @@ body {
 }
 
 .setting-select {
-    flex: 1;
     padding: var(--spacing-sm) var(--spacing-md);
     background: var(--mantle);
     border: 1px solid var(--glass-border);
