@@ -1937,6 +1937,10 @@ body {
     margin-bottom: var(--spacing-lg);
 }
 
+.links-grid.categories-hidden > * {
+    display: none;
+}
+
 .links-grid.footer-pinned {
     flex-grow: 1;
     align-content: start;
@@ -2895,7 +2899,7 @@ button,
     animation: fadeInUp 0.6s ease backwards;
 }
 
-.search-container {
+.search-container, .toolbar-btns {
     animation: fadeInUp 0.6s ease 0.1s backwards;
 }
 

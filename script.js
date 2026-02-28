@@ -227,6 +227,7 @@ function loadSettings() {
         tempUnit: 'F',
         showQuotes: 'true',
         showSearchBar: 'true',
+        showCateogires: 'true',
         preferredColumns: 'auto',
         enabledEngines: mobile ? ['google'] : ['google', 'duckduckgo', 'github', 'youtube'],
         preferredEngine: 'google',
@@ -278,6 +279,7 @@ function loadSettings() {
         tempUnit: localStorage.getItem('tempUnit') ?? defaults.tempUnit,
         showQuotes: localStorage.getItem('showQuotes') ?? defaults.showQuotes,
         showSearchBar: localStorage.getItem('showSearchBar') ?? defaults.showSearchBar,
+        showCategories: localStorage.getItem('showCategories') ?? defaults.showCategories,
         preferredColumns: localStorage.getItem('preferredColumns') ?? defaults.preferredColumns,
         enabledEngines: JSON.parse(localStorage.getItem('enabledEngines')) ?? defaults.enabledEngines,
         preferredEngine: localStorage.getItem('preferredEngine') ?? defaults.preferredEngine,
@@ -567,6 +569,15 @@ function applyColorMode(mode) {
 function applyDensity(density) {
     document.documentElement.setAttribute('data-density', density);
     saveSettings('density', density);
+}
+
+function applyCategoriesVisibility() {
+    const categoriesSection = document.querySelector('.links-grid');
+    const isVisible = settings.showCategories !== 'false';
+
+    if (categoriesSection) {
+        categoriesSection.classList.toggle('categories-hidden', !isVisible);
+    }
 }
 
 function applySearchVisibility() {
@@ -1812,6 +1823,8 @@ function initSettings() {
                 applyFooterPinBottom();
             } else if (setting === 'showSearchBar') {
                 applySearchVisibility();
+            } else if (setting === 'showCategories') {
+                applyCategoriesVisibility();
             } else if (setting === 'headerLeft' || setting === 'headerRight') {
                 updateHeader();
             } else if (setting === 'footerLeft' || setting === 'footerCenter' || setting === 'footerRight') {
@@ -3089,6 +3102,12 @@ function init() {
     } else if (settings.enabledEngines.length > 0) {
         setSearchEngine(settings.enabledEngines[0]);
     }
+
+    // Set search visibility
+    applySearchVisibility();
+
+    // Set categories visibility
+    applyCategoriesVisibility();
 
     // Initialize event listeners
     initEventListeners();
