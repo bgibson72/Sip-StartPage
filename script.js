@@ -10,13 +10,103 @@ const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 // Mobile detection
 const isMobile = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
         || window.innerWidth <= 768;
 };
 
 // ========================================
+// Supported Languages / Locales
+// ========================================
+const LOCALES = {
+    sq: "Shqip",                    // Albanian
+    af: "Afrikaans",                // Afrikaans
+    ar: "العربية",                  // Arabic
+    az: "Azərbaycan dili",          // Azerbaijani
+    eu: "Euskara",                  // Basque
+    be: "Беларуская",               // Belarusian
+    bg: "Български",                // Bulgarian
+    ca: "Català",                   // Catalan
+    zh_cn: "简体中文",              // Chinese (Simplified)
+    zh_tw: "繁體中文",              // Chinese (Traditional)
+    hr: "Hrvatski",                 // Croatian
+    cz: "Čeština",                  // Czech
+    da: "Dansk",                    // Danish
+    nl: "Nederlands",               // Dutch
+    en: "English",                  // English
+    fi: "Suomi",                    // Finnish
+    fr: "Français",                 // French
+    gl: "Galego",                   // Galician
+    de: "Deutsch",                  // German
+    el: "Ελληνικά",                 // Greek
+    he: "עברית",                    // Hebrew
+    hi: "हिन्दी",                      // Hindi
+    hu: "Magyar",                   // Hungarian
+    is: "Íslenska",                 // Icelandic
+    id: "Bahasa Indonesia",         // Indonesian
+    it: "Italiano",                 // Italian
+    ja: "日本語",                   // Japanese
+    kr: "한국어",                   // Korean
+    ku: "Kurdî",                    // Kurdish (Kurmanji)
+    la: "Latviešu",                 // Latvian
+    lt: "Lietuvių",                 // Lithuanian
+    mk: "Македонски",               // Macedonian
+    no: "Norsk",                    // Norwegian
+    fa: "فارسی",                    // Persian (Farsi)
+    pl: "Polski",                   // Polish
+    pt: "Português",                // Portuguese
+    pt_br: "Português (Brasil)",    // Portuguese (Brazil)
+    ro: "Română",                   // Romanian
+    ru: "Русский",                  // Russian
+    sr: "Српски",                   // Serbian
+    sk: "Slovenčina",               // Slovak
+    sl: "Slovenščina",              // Slovenian
+    es: "Español",                  // Spanish
+    sv: "Svenska",                  // Swedish
+    th: "ไทย",                      // Thai
+    tr: "Türkçe",                   // Turkish
+    uk: "Українська",               // Ukrainian
+    vi: "Tiếng Việt",               // Vietnamese
+    zu: "isiZulu"                   // Zulu
+};
+
+// === Separators per locale ===
+const GREETING_SEPARATORS = {
+  en: ",", es: ",", fr: ",", de: ",", it: ",", pt: ",", pt_br: ",",
+  ru: ",", ja: "、", zh_cn: "，", zh_tw: "，", kr: "、",
+  hi: ",", ar: "،", he: ":"
+};
+
+// === Right-to-left language codes ===
+const RTL_LANGS = ['ar', 'he', 'fa', 'ur', 'ps'];
+
+// ========================================
 // Default Data
 // ========================================
+
+const defaultLocale = (() => {
+    const lang = (navigator.language || "en").toLowerCase();
+
+    // Chinese special handling
+    if (lang.startsWith("zh")) {
+        return lang.includes("tw") ? "zh_tw" : "zh_cn";
+    }
+
+    // Brazilian Portuguese special handling
+    if (lang.startsWith("pt")) {
+        return lang.includes("br") ? "pt_br" : "pt";
+    }
+
+    // Direct match
+    const base = lang.split("-")[0];
+    return LOCALES[base] ? base : "en";
+})();
+
+const defaultGreetings = {
+    'morning': 'Good morning',
+    'afternoon': 'Good afternoon',
+    'evening': 'Good evening',
+    'night': 'Good night'
+}
 
 const defaultCategories = [
     { id: 'dev', name: 'Development', icon: 'fa-solid fa-code' },
@@ -125,17 +215,20 @@ const allSearchEngines = {
 
 function loadSettings() {
     const mobile = isMobile();
-    
+
     const defaults = {
         userName: '',
         colorScheme: 'catppuccin',
         theme: 'dark',
         colorMode: 'multi',
+        font: 'jetbrains-mono',
         timeFormat: '12',
         showSeconds: 'false',
         tempUnit: 'F',
         showQuotes: 'true',
+        leftSettings: 'false',
         showSearchBar: 'true',
+        showCategories: 'true',
         preferredColumns: 'auto',
         enabledEngines: mobile ? ['google'] : ['google', 'duckduckgo', 'github', 'youtube'],
         preferredEngine: 'google',
@@ -143,6 +236,8 @@ function loadSettings() {
         openWeatherApiKey: '',
         linkBehavior: 'same',
         showKeyboardHints: mobile ? 'false' : 'true',
+        keyboardHintsPosition: 'below',
+        showCredits: 'true',
         density: mobile ? 'compact' : 'comfy',
         iconOnlyMode: 'false',
         headerLeft: 'greeting',
@@ -150,6 +245,8 @@ function loadSettings() {
         footerLeft: mobile ? 'blank' : 'weather',
         footerCenter: mobile ? 'weather' : 'blank',
         footerRight: mobile ? 'blank' : 'quotes',
+        footerPinBottom: 'false',
+        locale: defaultLocale,
         socialLinks: [],
         quotes: [
             '"The only way to do great work is to love what you do." - Steve Jobs',
@@ -171,17 +268,20 @@ function loadSettings() {
             text: '#cdd6f4'
         }
     };
-    
+
     return {
         userName: localStorage.getItem('userName') ??  defaults.userName,
         colorScheme: localStorage.getItem('colorScheme') ?? defaults.colorScheme,
+        font: localStorage.getItem('font') ?? defaults.font,
         theme: localStorage.getItem('theme') ?? defaults.theme,
         colorMode: localStorage.getItem('colorMode') ?? defaults.colorMode,
         timeFormat: localStorage.getItem('timeFormat') ?? defaults.timeFormat,
         showSeconds: localStorage.getItem('showSeconds') ?? defaults.showSeconds,
         tempUnit: localStorage.getItem('tempUnit') ?? defaults.tempUnit,
         showQuotes: localStorage.getItem('showQuotes') ?? defaults.showQuotes,
+        leftSettings: localStorage.getItem('leftSettings') ?? defaults.leftSettings,
         showSearchBar: localStorage.getItem('showSearchBar') ?? defaults.showSearchBar,
+        showCategories: localStorage.getItem('showCategories') ?? defaults.showCategories,
         preferredColumns: localStorage.getItem('preferredColumns') ?? defaults.preferredColumns,
         enabledEngines: JSON.parse(localStorage.getItem('enabledEngines')) ?? defaults.enabledEngines,
         preferredEngine: localStorage.getItem('preferredEngine') ?? defaults.preferredEngine,
@@ -189,6 +289,8 @@ function loadSettings() {
         openWeatherApiKey: localStorage.getItem('openWeatherApiKey') ??  defaults.openWeatherApiKey,
         linkBehavior: localStorage.getItem('linkBehavior') ?? defaults.linkBehavior,
         showKeyboardHints: localStorage.getItem('showKeyboardHints') ?? defaults.showKeyboardHints,
+        keyboardHintsPosition: localStorage.getItem('keyboardHintsPosition') ?? defaults.keyboardHintsPosition,
+        showCredits: localStorage.getItem('showCredits') ?? defaults.showCredits,
         density: localStorage.getItem('density') ?? defaults.density,
         iconOnlyMode: localStorage.getItem('iconOnlyMode') ?? defaults.iconOnlyMode,
         headerLeft: localStorage.getItem('headerLeft') ?? defaults.headerLeft,
@@ -196,7 +298,9 @@ function loadSettings() {
         footerLeft: localStorage.getItem('footerLeft') ?? defaults.footerLeft,
         footerCenter: localStorage.getItem('footerCenter') ?? defaults.footerCenter,
         footerRight: localStorage.getItem('footerRight') ?? defaults.footerRight,
+        footerPinBottom: localStorage.getItem('footerPinBottom') ?? defaults.footerPinBottom,
         socialLinks: JSON.parse(localStorage.getItem('socialLinks')) ?? defaults.socialLinks,
+        locale: localStorage.getItem('locale') ?? defaults.locale,
         quotes: JSON.parse(localStorage.getItem('quotes')) ?? defaults.quotes,
         customColors: JSON.parse(localStorage.getItem('customColors') || JSON.stringify(defaults.customColors)),
         backgroundImage: localStorage.getItem('backgroundImage') || null,
@@ -214,10 +318,16 @@ function saveSettings(key, value) {
     settings[key] = value;
 }
 
+function loadGreetings() {
+    const saved = localStorage.getItem('greetings');
+    if (!saved) return defaultGreetings;
+    return JSON.parse(saved);
+}
+
 function loadCategories() {
     const saved = localStorage.getItem('categories');
     if (!saved) return [...defaultCategories];
-    
+
     // Migrate old HTML format to simple class format
     const cats = JSON.parse(saved);
     return cats.map(cat => {
@@ -247,9 +357,11 @@ function saveLinks(lnks) {
 
 // Initialize settings
 let settings = loadSettings();
+let greetings = loadGreetings();
 let categories = loadCategories();
 let links = loadLinks();
 let currentEngine = settings.preferredEngine;
+let weatherApiState = settings.openWeatherApiKey ? 'pending' : 'none'; // 'none' | 'pending' | 'ok' | 'error'
 
 // ========================================
 // Theme Management
@@ -265,15 +377,15 @@ function applyColorScheme(scheme) {
     if (scheme !== 'custom') {
         clearCustomColors();
     }
-    
+
     document.documentElement.setAttribute('data-scheme', scheme);
     saveSettings('colorScheme', scheme);
-    
+
     // Apply custom colors if custom scheme selected
     if (scheme === 'custom') {
         applyCustomColors();
     }
-    
+
     // Update color mode visibility based on scheme
     updateColorModeVisibility();
 }
@@ -282,7 +394,7 @@ function saveCustomColor(property, value) {
     const customColors = settings.customColors || {};
     customColors[property] = value;
     saveSettings('customColors', customColors);
-    
+
     if (settings.colorScheme === 'custom') {
         applyCustomColors();
     }
@@ -291,7 +403,7 @@ function saveCustomColor(property, value) {
 function applyCustomColors() {
     const customColors = settings.customColors || {};
     const root = document.documentElement;
-    
+
     // Apply primary colors
     if (customColors.primary) {
         root.style.setProperty('--primary', customColors.primary);
@@ -305,13 +417,13 @@ function applyCustomColors() {
         root.style.setProperty('--accent', customColors.accent);
         root.style.setProperty('--teal', customColors.accent);
     }
-    
+
     // Apply background colors
     if (customColors.background) {
         root.style.setProperty('--base', customColors.background);
         root.style.setProperty('--crust', customColors.background);
     }
-    
+
     // Apply surface colors
     if (customColors.surface) {
         root.style.setProperty('--surface0', customColors.surface);
@@ -319,7 +431,7 @@ function applyCustomColors() {
         root.style.setProperty('--mantle', customColors.surface);
         root.style.setProperty('--surface2', customColors.surface);
     }
-    
+
     // Apply text colors
     if (customColors.text) {
         root.style.setProperty('--text', customColors.text);
@@ -332,7 +444,7 @@ function applyCustomColors() {
         root.style.setProperty('--overlay1', textColor + '99'); // 60% opacity
         root.style.setProperty('--overlay2', textColor + '66'); // 40% opacity
     }
-    
+
     // Set other accent colors to match primary/secondary for consistency
     if (customColors.primary) {
         root.style.setProperty('--pink', customColors.primary);
@@ -347,7 +459,7 @@ function applyCustomColors() {
     if (customColors.secondary) {
         root.style.setProperty('--lavender', customColors.secondary);
     }
-    
+
     // Set gradients using custom colors
     if (customColors.primary && customColors.secondary) {
         root.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${customColors.primary} 0%, ${customColors.secondary} 100%)`);
@@ -355,7 +467,7 @@ function applyCustomColors() {
     if (customColors.accent && customColors.secondary) {
         root.style.setProperty('--gradient-accent', `linear-gradient(135deg, ${customColors.accent} 0%, ${customColors.secondary} 100%)`);
     }
-    
+
     // Set glass effects with custom background
     if (customColors.background) {
         // Parse background color to create glass effect
@@ -372,32 +484,32 @@ function applyCustomColors() {
 
 function clearCustomColors() {
     const root = document.documentElement;
-    
+
     // Remove semantic colors
     root.style.removeProperty('--primary');
     root.style.removeProperty('--secondary');
     root.style.removeProperty('--accent');
-    
+
     // Remove base colors
     root.style.removeProperty('--base');
     root.style.removeProperty('--crust');
-    
+
     // Remove surface colors
     root.style.removeProperty('--surface0');
     root.style.removeProperty('--surface1');
     root.style.removeProperty('--surface2');
     root.style.removeProperty('--mantle');
-    
+
     // Remove text colors
     root.style.removeProperty('--text');
     root.style.removeProperty('--subtext0');
     root.style.removeProperty('--subtext1');
-    
+
     // Remove overlay colors
     root.style.removeProperty('--overlay0');
     root.style.removeProperty('--overlay1');
     root.style.removeProperty('--overlay2');
-    
+
     // Remove accent color variations
     root.style.removeProperty('--mauve');
     root.style.removeProperty('--blue');
@@ -409,11 +521,11 @@ function clearCustomColors() {
     root.style.removeProperty('--sky');
     root.style.removeProperty('--sapphire');
     root.style.removeProperty('--lavender');
-    
+
     // Remove gradients
     root.style.removeProperty('--gradient-primary');
     root.style.removeProperty('--gradient-accent');
-    
+
     // Remove glass effects
     root.style.removeProperty('--glass-bg');
 }
@@ -421,7 +533,7 @@ function clearCustomColors() {
 function updateColorModeVisibility() {
     const colorModeItem = document.querySelector('[data-setting="colorMode"]')?.closest('.setting-item');
     const themeItem = document.querySelector('[data-setting="theme"]')?.closest('.setting-item');
-    
+
     if (colorModeItem) {
         // Hide color mode option for monochrome scheme or disable for custom
         if (settings.colorScheme === 'monochrome') {
@@ -436,7 +548,7 @@ function updateColorModeVisibility() {
             colorModeItem.style.pointerEvents = 'auto';
         }
     }
-    
+
     if (themeItem) {
         // Disable mode toggle for custom scheme
         if (settings.colorScheme === 'custom') {
@@ -458,6 +570,24 @@ function applyColorMode(mode) {
 function applyDensity(density) {
     document.documentElement.setAttribute('data-density', density);
     saveSettings('density', density);
+}
+
+function applyCategoriesVisibility() {
+    const categoriesSection = document.querySelector('.links-grid');
+    const isVisible = settings.showCategories !== 'false';
+
+    if (categoriesSection) {
+        categoriesSection.classList.toggle('categories-hidden', !isVisible);
+    }
+}
+
+function applySettingsBtnPosition() {
+    const toolbar = document.querySelector('.toolbar-btns');
+    const leftSettings = settings.leftSettings === 'true';
+
+    if (toolbar) {
+        toolbar.classList.toggle('left', leftSettings);
+    }
 }
 
 function applySearchVisibility() {
@@ -505,10 +635,10 @@ if (settings.colorScheme === 'custom') {
 function applyBackgroundImage() {
     const body = document.body;
     if (!body) return;
-    
+
     if (settings.backgroundImage) {
         body.style.backgroundImage = `url(${settings.backgroundImage})`;
-        
+
         // Apply background size based on setting
         switch (settings.backgroundSize) {
             case 'contain':
@@ -525,11 +655,11 @@ function applyBackgroundImage() {
                 body.style.backgroundSize = 'cover';
                 break;
         }
-        
+
         body.style.backgroundPosition = 'center';
         body.style.backgroundRepeat = 'no-repeat';
         body.style.backgroundAttachment = 'fixed';
-        
+
         // Apply blur if enabled
         if (settings.backgroundBlur) {
             // Create overlay to blur only the background
@@ -577,13 +707,13 @@ function applyBackgroundImage() {
 function handleBackgroundImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     // Check file size (limit to 5MB)
     if (file.size > 5 * 1024 * 1024) {
         alert('Image size should be less than 5MB');
         return;
     }
-    
+
     const reader = new FileReader();
     reader.onload = function(e) {
         const imageData = e.target.result;
@@ -609,18 +739,18 @@ function updateBackgroundImageUI() {
     const sizeSection = document.getElementById('background-size-section');
     const sizeSelect = document.getElementById('background-size-select');
     const blurSection = document.getElementById('background-blur-section');
-    
+
     if (settings.backgroundImage) {
         previewImg.src = settings.backgroundImage;
         previewSection.style.display = 'flex';
         removeBtn.style.display = 'flex';
         sizeSection.style.display = 'flex';
         if (blurSection) blurSection.style.display = 'flex';
-        
+
         if (sizeSelect) {
             sizeSelect.value = settings.backgroundSize || 'cover';
         }
-        
+
         // Update blur toggle buttons
         if (blurSection) {
             const blurButtons = blurSection.querySelectorAll('.toggle-btn');
@@ -652,60 +782,74 @@ let searchInput, timeElement, dateElement, greetingElement, weatherElement, quot
 
 function updateDateTime() {
     if (!timeElement || !dateElement) return;
-    
+
     const now = new Date();
-    
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const seconds = now.getSeconds().toString().padStart(2, '0');
-    let timeString;
-    
-    if (settings.timeFormat === '12') {
-        const period = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-        if (settings.showSeconds === 'true') {
-            timeString = `${hours}:${minutes}:${seconds} ${period}`;
-        } else {
-            timeString = `${hours}:${minutes} ${period}`;
-        }
-    } else {
-        if (settings.showSeconds === 'true') {
-            timeString = `${hours.toString().padStart(2, '0')}:${minutes}:${seconds}`;
-        } else {
-            timeString = `${hours.toString().padStart(2, '0')}:${minutes}`;
-        }
-    }
-    
+
+    const use12Hour = settings.timeFormat === '12';
+    const showSeconds = settings.showSeconds === 'true';
+    const locale = settings.locale;
+
+    const timeString = now.toLocaleTimeString(locale, {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: showSeconds ? '2-digit' : undefined,
+        hour12: use12Hour
+    });
+
     timeElement.textContent = timeString;
-    
-    const options = { weekday: 'long', month: 'short', day: 'numeric' };
-    dateElement.textContent = now.toLocaleDateString('en-US', options);
-    
+
+    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+    dateElement.textContent = now.toLocaleDateString(locale, options);
+
     updateGreeting(now.getHours());
+}
+
+function getTimeBasedGreeting(hour) {
+    if (hour >= 5 && hour < 12) {
+        greeting = greetings.morning;
+        iconHtml = '<span class="nf-icon">󰖜</span>';
+    } else if (hour >= 12 && hour < 17) {
+        greeting = greetings.afternoon;
+        iconHtml = '<i class="fa-solid fa-sun"></i>';
+    } else if (hour >= 17 && hour < 21) {
+        greeting = greetings.evening;
+        iconHtml = '<span class="nf-icon">󰖛</span>';
+    } else {
+        greeting = greetings.night;
+        iconHtml = '<i class="fa-solid fa-moon"></i>';
+    }
+    return { greeting, iconHtml };
+}
+
+function greet(name, hour = 12, locale = 'en') {
+    // Normalize locale (lowercase, replace dash with underscore)
+    locale = locale.toLowerCase().replace('-', '_');
+    const lang = locale.split('_')[0];
+
+    const sep = GREETING_SEPARATORS[locale] || GREETING_SEPARATORS[lang] || ',';
+    let { greeting, iconHtml } = getTimeBasedGreeting(hour);
+
+    greeting = name ? `${greeting}${sep} ${name}` : greeting;
+
+    // Wrap in RTL marks if needed
+    if (RTL_LANGS.includes(lang)) {
+        greeting = `\u202B${greeting}\u202C`; // RLE and PDF marks
+    }
+
+    return { greeting, iconHtml };
 }
 
 function updateGreeting(hour) {
     if (!greetingElement) return;
-    
+
     let greeting, iconHtml;
-    
-    if (hour >= 5 && hour < 12) {
-        greeting = 'Good morning';
-        iconHtml = '<span class="nf-icon">󰖜</span>';
-    } else if (hour >= 12 && hour < 17) {
-        greeting = 'Good afternoon';
-        iconHtml = '<i class="fa-solid fa-sun"></i>';
-    } else if (hour >= 17 && hour < 21) {
-        greeting = 'Good evening';
-        iconHtml = '<span class="nf-icon">󰖛</span>';
-    } else {
-        greeting = 'Good night';
-        iconHtml = '<i class="fa-solid fa-moon"></i>';
-    }
-    
     const userName = settings.userName;
-    greetingElement.textContent = userName ? `${greeting}, ${userName}` : greeting;
-    
+    const greetingData = greet(userName, hour, settings.locale);
+    greeting = greetingData.greeting;
+    iconHtml = greetingData.iconHtml;
+
+    greetingElement.textContent = greeting;
+
     const iconElement = document.getElementById('greeting-icon');
     if (iconElement) {
         iconElement.innerHTML = iconHtml;
@@ -718,7 +862,7 @@ function updateGreeting(hour) {
 
 function performSearch(query) {
     if (!query.trim()) return;
-    
+
     // Use Chrome Search API if available (respects user's default search engine)
     if (typeof chrome !== 'undefined' && chrome.search && chrome.search.query) {
         chrome.search.query({
@@ -729,7 +873,7 @@ function performSearch(query) {
         // Fallback for Firefox or when Chrome Search API is not available
         const engine = allSearchEngines[currentEngine];
         if (!engine) return;
-        
+
         const searchUrl = engine.url + encodeURIComponent(query);
         window.location.href = searchUrl;
     }
@@ -738,14 +882,14 @@ function performSearch(query) {
 function setSearchEngine(engine) {
     if (!allSearchEngines[engine]) return;
     if (!settings.enabledEngines.includes(engine)) return;
-    
+
     currentEngine = engine;
     saveSettings('preferredEngine', engine);
-    
+
     document.querySelectorAll('.search-engines .engine').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.engine === engine);
     });
-    
+
     if (searchInput) {
         searchInput.placeholder = `Search ${allSearchEngines[engine].name}... `;
     }
@@ -754,19 +898,19 @@ function setSearchEngine(engine) {
 function renderSearchEngines() {
     const container = document.querySelector('.search-engines');
     if (!container) return;
-    
+
     container.innerHTML = settings.enabledEngines.map((engineId, index) => {
         const engine = allSearchEngines[engineId];
         if (!engine) return '';
         return `
-            <button class="engine ${engineId === currentEngine ? 'active' : ''}" 
-                    data-engine="${engineId}" 
+            <button class="engine ${engineId === currentEngine ? 'active' : ''}"
+                    data-engine="${engineId}"
                     title="${engine.name} (${index + 1})">
                 ${engine.icon}
             </button>
         `;
     }). join('');
-    
+
     // Rebind click events
     container.querySelectorAll('.engine').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -774,15 +918,19 @@ function renderSearchEngines() {
             if (searchInput) searchInput.focus();
         });
     });
-    
+
     // Update keyboard hints
     updateKeyboardHints();
+    applyCreditsVisibility();
+    applyFooterPinBottom();
+    applyKeyboardHintsPosition();
+    applyFont(settings.font);
 }
 
 function updateKeyboardHints() {
     const hintsContainer = document.querySelector('.keyboard-hints');
     if (!hintsContainer) return;
-    
+
     // Show or hide keyboard hints based on setting
     if (settings.showKeyboardHints === 'false') {
         hintsContainer.style.display = 'none';
@@ -790,11 +938,11 @@ function updateKeyboardHints() {
     } else {
         hintsContainer.style.display = 'flex';
     }
-    
+
     const engineCount = settings.enabledEngines.length;
     const maxEngines = 9; // Maximum possible engines
     const engineHint = engineCount > 1 ? `<kbd>1-${Math.min(engineCount, maxEngines)}</kbd> Engine` : '';
-    
+
     hintsContainer.innerHTML = `
         <span class="hint"><kbd>/</kbd> Search</span>
         ${engineHint ?  `<span class="hint">${engineHint}</span>` : ''}
@@ -803,6 +951,58 @@ function updateKeyboardHints() {
 }
 
 // ========================================
+function applyCreditsVisibility() {
+    const credits = document.querySelector('.developer-credits');
+    if (credits) credits.style.display = settings.showCredits === 'false' ? 'none' : '';
+}
+
+function updateWeatherApiStatus() {
+    const el = document.getElementById('weather-api-status');
+    if (!el) return;
+    if (weatherApiState === 'ok') {
+        el.className = 'setting-description weather-api-status ok';
+        el.innerHTML = '<i class="fa-solid fa-check"></i> Live weather enabled';
+    } else if (weatherApiState === 'error') {
+        el.className = 'setting-description weather-api-status warning';
+        el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Request failed — check key and location';
+    } else if (weatherApiState === 'none') {
+        el.className = 'setting-description weather-api-status warning';
+        el.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> No API key — showing demo data';
+    }
+}
+
+const fontFamilyMap = {
+    'jetbrains-mono': "'JetBrains Mono'",
+    'fira-code': "'Fira Code'",
+    'source-code-pro': "'Source Code Pro'",
+    'ibm-plex-mono': "'IBM Plex Mono'",
+    'inconsolata': "'Inconsolata'",
+    'space-mono': "'Space Mono'",
+};
+
+function applyFont(font) {
+    const family = fontFamilyMap[font] ?? fontFamilyMap['jetbrains-mono'];
+    document.documentElement.style.setProperty('--font-mono', family);
+}
+
+function applyFooterPinBottom() {
+    const linksGrid = document.getElementById('links-grid');
+    if (linksGrid) linksGrid.classList.toggle('footer-pinned', settings.footerPinBottom === 'true');
+}
+
+function applyKeyboardHintsPosition() {
+    const hints = document.querySelector('.keyboard-hints');
+    const footer = document.querySelector('footer.footer');
+    if (!hints || !footer) return;
+    if (settings.keyboardHintsPosition === 'above') {
+        footer.before(hints);
+        hints.classList.add('hints-above-footer');
+    } else {
+        footer.after(hints);
+        hints.classList.remove('hints-above-footer');
+    }
+}
+
 // Weather Function (OpenWeather API Integration)
 // ========================================
 
@@ -836,24 +1036,24 @@ async function fetchWeather(query) {
     try {
         const unit = settings.tempUnit === 'C' ? 'metric' : 'imperial';
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?${query}&appid=${settings.openWeatherApiKey}&units=${unit}`
+            `https://api.openweathermap.org/data/2.5/weather?${query}&appid=${settings.openWeatherApiKey}&units=${unit}&lang=${settings.locale}`
         );
-        
+
         if (!response.ok) {
             console.error('Weather API error:', response.status, response.statusText);
             throw new Error('Weather API error');
         }
-        
+
         const data = await response.json();
 
         // Get temperature, condition, and icon info
         const temp = Math.round(data.main.temp);
-        const condition = data.weather[0].main; // e.g., "Clouds"
+        const condition = data.weather[0].description;
         const iconCode = data.weather[0].icon;
         const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
         const tempUnit = unit === 'metric' ? '°C' : '°F';
-        
+
         // Get the parent widget and find the icon element
         const widgetElement = weatherElement.parentElement;
         if (widgetElement) {
@@ -863,18 +1063,22 @@ async function fetchWeather(query) {
                 iconElement.innerHTML = `<img src="${iconUrl}" alt="" style="width:2em;height:2em;margin:-0.25em 0;vertical-align:middle;">`;
             }
         }
-        
+
         weatherElement.textContent = `${temp}${tempUnit} ${condition}`;
+        weatherApiState = 'ok';
+        updateWeatherApiStatus();
+        weatherElement.parentElement?.querySelector('.weather-demo-badge')?.remove();
     } catch (err) {
         console.error('Weather fetch error:', err);
-        // Fall back to mock weather on error
+        weatherApiState = 'error';
+        updateWeatherApiStatus();
         showMockWeather();
     }
 }
 
 function showMockWeather() {
     if (!weatherElement) return;
-    
+
     const mockWeatherData = [
         { tempF: 72, condition: 'Partly Cloudy', icon: 'fa-cloud-sun' },
         { tempF: 64, condition: 'Cloudy', icon: 'fa-cloud' },
@@ -885,9 +1089,9 @@ function showMockWeather() {
         { tempF: 28, condition: 'Snow', icon: 'fa-snowflake' },
         { tempF: 55, condition: 'Windy', icon: 'fa-wind' }
     ];
-    
+
     const weather = mockWeatherData[Math.floor(Math.random() * mockWeatherData. length)];
-    
+
     let temp, unit;
     if (settings.tempUnit === 'C') {
         temp = Math.round((weather.tempF - 32) * 5 / 9);
@@ -896,15 +1100,22 @@ function showMockWeather() {
         temp = weather.tempF;
         unit = '°F';
     }
-    
+
     weatherElement.textContent = `${temp}${unit} ${weather.condition}`;
-    
+
     // Get the parent widget and find the icon element
     const widgetElement = weatherElement.parentElement;
     if (widgetElement) {
         const iconElement = widgetElement.querySelector('.widget-icon');
         if (iconElement) {
             iconElement.innerHTML = `<i class="fa-solid ${weather.icon}"></i>`;
+        }
+        if (!widgetElement.querySelector('.weather-demo-badge')) {
+            const badge = document.createElement('span');
+            badge.className = 'weather-demo-badge';
+            badge.title = 'Showing demo data · Add an API key in Settings → Widgets';
+            badge.textContent = 'demo';
+            widgetElement.appendChild(badge);
         }
     }
 }
@@ -929,25 +1140,25 @@ async function fetchForecast(query) {
     try {
         const unit = settings.tempUnit === 'C' ? 'metric' : 'imperial';
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/forecast?${query}&appid=${settings.openWeatherApiKey}&units=${unit}&cnt=40`
+            `https://api.openweathermap.org/data/2.5/forecast?${query}&appid=${settings.openWeatherApiKey}&units=${unit}&cnt=40&lang=${settings.locale}`
         );
-        
+
         if (!response.ok) {
             console.error('Forecast API error:', response.status, response.statusText);
             throw new Error('Forecast API error');
         }
-        
+
         const data = await response.json();
-        
+
         // Process forecast data to get one forecast per day (noon time), starting from tomorrow
         const dailyForecasts = [];
         const processedDates = new Set();
         const today = new Date().toDateString();
-        
+
         for (const item of data.list) {
             const date = new Date(item.dt * 1000);
             const dateStr = date.toDateString();
-            
+
             // Skip today, get forecast around noon for each day (12:00 PM)
             if (dateStr !== today && !processedDates.has(dateStr) && date.getHours() >= 12 && date.getHours() <= 15) {
                 processedDates.add(dateStr);
@@ -956,15 +1167,15 @@ async function fetchForecast(query) {
                     temp: Math.round(item.main.temp),
                     tempMax: Math.round(item.main.temp_max),
                     tempMin: Math.round(item.main.temp_min),
-                    condition: item.weather[0].main,
+                    condition: item.weather[0].description,
                     icon: item.weather[0].icon
                 });
-                
+
                 if (dailyForecasts.length === 3) break;
             }
         }
-        
-        renderForecastWidget(dailyForecasts, unit);
+
+        renderForecastWidget(dailyForecasts);
     } catch (err) {
         console.error('Forecast fetch error:', err);
         showMockForecast();
@@ -974,12 +1185,12 @@ async function fetchForecast(query) {
 function showMockForecast() {
     const today = new Date();
     const mockDailyForecasts = [];
-    
+
     // Generate 3 days starting from tomorrow
     for (let i = 1; i <= 3; i++) {
         const forecastDate = new Date(today);
         forecastDate.setDate(today.getDate() + i);
-        
+
         const mockConditions = [
             { temp: 72, tempMax: 75, tempMin: 65, condition: 'Sunny', icon: 'fa-sun' },
             { temp: 68, tempMax: 70, tempMin: 62, condition: 'Cloudy', icon: 'fa-cloud' },
@@ -987,9 +1198,9 @@ function showMockForecast() {
             { temp: 70, tempMax: 73, tempMin: 64, condition: 'Partly Cloudy', icon: 'fa-cloud-sun' },
             { temp: 74, tempMax: 77, tempMin: 66, condition: 'Clear', icon: 'fa-sun' }
         ];
-        
+
         const condition = mockConditions[i % mockConditions.length];
-        
+
         mockDailyForecasts.push({
             date: forecastDate,
             temp: condition.temp,
@@ -999,9 +1210,9 @@ function showMockForecast() {
             icon: condition.icon
         });
     }
-    
+
     const tempUnit = settings.tempUnit === 'C' ? 'metric' : 'imperial';
-    
+
     // Convert to Celsius if needed
     const forecasts = mockDailyForecasts.map(forecast => {
         if (settings.tempUnit === 'C') {
@@ -1014,26 +1225,18 @@ function showMockForecast() {
         }
         return forecast;
     });
-    
-    renderForecastWidget(forecasts, tempUnit, false);
+
+    renderForecastWidget(forecasts, true);
 }
 
-function renderForecastWidget(forecasts, unit, isMock = false) {
+function renderForecastWidget(forecasts, isMock = false) {
     const forecastWidget = document.querySelector('.forecast-widget');
     if (!forecastWidget) return;
-    
-    const tempUnit = unit === 'metric' ? '°C' : '°F';
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
+
     const forecastHTML = forecasts.map((forecast, index) => {
-        let dayName;
-        if (forecast.date) {
-            dayName = dayNames[forecast.date.getDay()];
-        } else {
-            // Fallback if no date (starting from tomorrow)
-            dayName = dayNames[(new Date().getDay() + index + 1) % 7];
-        }
-        
+        const date = forecast.date ?? new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000);
+        const dayName = new Intl.DateTimeFormat(settings.locale, { weekday: 'short' }).format(date);
+
         let iconHTML;
         if (isMock) {
             iconHTML = `<i class="fa-solid ${forecast.icon}"></i>`;
@@ -1043,7 +1246,7 @@ function renderForecastWidget(forecasts, unit, isMock = false) {
             const iconUrl = `https://openweathermap.org/img/wn/${forecast.icon}@2x.png`;
             iconHTML = `<img src="${iconUrl}" alt="${forecast.condition}">`;
         }
-        
+
         return `
             <div class="forecast-day">
                 <div class="forecast-day-name">${dayName}</div>
@@ -1052,8 +1255,22 @@ function renderForecastWidget(forecasts, unit, isMock = false) {
             </div>
         `;
     }).join('');
-    
+
     forecastWidget.innerHTML = `<div class="forecast-days">${forecastHTML}</div>`;
+
+    const forecastDays = forecastWidget.querySelector('.forecast-days');
+    let badge = forecastDays.querySelector('.weather-demo-badge');
+    if (isMock) {
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'weather-demo-badge';
+            badge.title = 'Showing demo data · Add an API key in Settings → Widgets';
+            badge.textContent = 'demo';
+            forecastDays.appendChild(badge);
+        }
+    } else {
+        badge?.remove();
+    }
 }
 
 // ========================================
@@ -1065,13 +1282,12 @@ function renderForecastWidget(forecasts, unit, isMock = false) {
 function updateQuote() {
     const quoteWidget = document.querySelector('.quote-widget');
     if (!quoteWidget || !quoteElement) return;
-    
+
     if (settings.showQuotes === 'true') {
         quoteWidget.style.display = 'flex';
         const quotes = settings.quotes || [];
         if (quotes.length > 0) {
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            quoteElement.textContent = randomQuote;
+            quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
         } else {
             quoteElement.textContent = '"Add some quotes in Settings!"';
         }
@@ -1087,25 +1303,25 @@ function updateQuote() {
 function renderSocialLinks() {
     // Get or create social links container
     let socialWidget = document.querySelector('.social-widget');
-    
+
     if (!socialWidget) {
         socialWidget = document.createElement('div');
         socialWidget.className = 'widget social-widget';
         socialWidget.innerHTML = '<div class="social-icons"></div>';
     }
-    
+
     const iconsContainer = socialWidget.querySelector('.social-icons');
     if (!iconsContainer) return;
-    
+
     // Filter visible social links
     const visibleLinks = settings.socialLinks.filter(link => link.visible && link.url);
-    
+
     if (visibleLinks.length > 0) {
         const target = settings.linkBehavior === 'new-tab' ? '_blank' : (settings.linkBehavior === 'new-window' ? '_blank' : '_self');
         iconsContainer.innerHTML = visibleLinks.map(link => {
             return `<a href="${link.url}" target="${target}" title="${link.name}" class="social-icon" data-link-behavior="${settings.linkBehavior}"><i class="${link.icon}"></i></a>`;
         }).join('');
-        
+
         // Add click handlers for social links
         iconsContainer.querySelectorAll('.social-icon').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -1119,7 +1335,7 @@ function renderSocialLinks() {
     } else {
         iconsContainer.innerHTML = '';
     }
-    
+
     return socialWidget;
 }
 
@@ -1130,28 +1346,28 @@ function renderSocialLinks() {
 function updateHeader() {
     const header = document.querySelector('.header');
     if (!header) return;
-    
+
     // Clear existing content
     header.innerHTML = '';
-    
+
     // Create sections based on settings
     const leftWidget = createHeaderWidget(settings.headerLeft, 'left');
     const rightWidget = createHeaderWidget(settings.headerRight, 'right');
-    
+
     // Check if both widgets are blank
     const bothBlank = settings.headerLeft === 'blank' && settings.headerRight === 'blank';
-    
+
     if (bothBlank) {
         header.style.display = 'none';
         return;
     }
-    
+
     header.style.display = 'flex';
-    
+
     if (leftWidget) {
         header.appendChild(leftWidget);
     }
-    
+
     if (rightWidget) {
         rightWidget.classList.add('header-right');
         header.appendChild(rightWidget);
@@ -1160,7 +1376,7 @@ function updateHeader() {
 
 function createHeaderWidget(type, position) {
     if (type === 'blank') return null;
-    
+
     if (type === 'greeting') {
         const widget = document.createElement('div');
         widget.className = 'greeting';
@@ -1175,7 +1391,7 @@ function createHeaderWidget(type, position) {
         }, 0);
         return widget;
     }
-    
+
     if (type === 'time-date') {
         const widget = document.createElement('div');
         widget.className = 'datetime';
@@ -1187,7 +1403,7 @@ function createHeaderWidget(type, position) {
         setTimeout(() => {
             timeElement = document.getElementById('time');
             dateElement = document.getElementById('date');
-            
+
             // Add click handler to toggle time format
             if (timeElement) {
                 timeElement.style.cursor = 'pointer';
@@ -1199,12 +1415,12 @@ function createHeaderWidget(type, position) {
                     updateToggleStates();
                 });
             }
-            
+
             updateDateTime();
         }, 0);
         return widget;
     }
-    
+
     return null;
 }
 
@@ -1215,27 +1431,27 @@ function createHeaderWidget(type, position) {
 function updateFooter() {
     const footer = document.querySelector('.footer');
     if (!footer) return;
-    
+
     // Clear existing content
     footer.innerHTML = '';
-    
+
     // Create sections based on settings
     const sections = [
         { position: 'left', setting: settings.footerLeft },
         { position: 'center', setting: settings.footerCenter },
         { position: 'right', setting: settings.footerRight }
     ];
-    
+
     // Check if all widgets are blank
     const allBlank = sections.every(section => section.setting === 'blank');
-    
+
     if (allBlank) {
         footer.style.display = 'none';
         return;
     }
-    
+
     footer.style.display = 'flex';
-    
+
     sections.forEach(section => {
         const widget = createFooterWidget(section.setting);
         if (widget) {
@@ -1248,7 +1464,7 @@ function updateFooter() {
 
 function createFooterWidget(type) {
     if (type === 'blank') return null;
-    
+
     if (type === 'weather') {
         const widget = document.createElement('div');
         widget.className = 'widget weather-widget';
@@ -1263,7 +1479,7 @@ function createFooterWidget(type) {
         }, 0);
         return widget;
     }
-    
+
     if (type === 'forecast') {
         const widget = document.createElement('div');
         widget.className = 'forecast-widget';
@@ -1274,7 +1490,7 @@ function createFooterWidget(type) {
         }, 0);
         return widget;
     }
-    
+
     if (type === 'quotes') {
         const widget = document.createElement('div');
         widget.className = 'widget quote-widget';
@@ -1293,7 +1509,7 @@ function createFooterWidget(type) {
     if (type === 'socials') {
         return renderSocialLinks();
     }
-    
+
     return null;
 }
 
@@ -1303,14 +1519,14 @@ function createFooterWidget(type) {
 
 function renderLinksGrid() {
     if (!linksGrid) return;
-    
+
     const colorMode = settings.colorMode;
     const linkTarget = settings.linkBehavior === 'new-tab' ? '_blank' : (settings.linkBehavior === 'new-window' ? '_blank' : '_self');
-    
+
     linksGrid.innerHTML = categories.map((category, index) => {
         const categoryLinks = links[category.id] || [];
         const colorClass = colorMode === 'multi' ? categoryColors[index % categoryColors.length] : 'mauve';
-        
+
         return `
             <section class="link-group" data-category="${category.id}" data-color="${colorClass}">
                 <h2 class="group-title">
@@ -1328,7 +1544,7 @@ function renderLinksGrid() {
             </section>
         `;
     }).join('');
-    
+
     // Add click handlers for link behavior
     document.querySelectorAll('.link-card').forEach(link => {
         link.addEventListener('click', function(e) {
@@ -1340,13 +1556,13 @@ function renderLinksGrid() {
             // 'same' uses target="_self" (default browser behavior)
         });
     });
-    
+
     updateGridLayout();
 }
 
 function updateGridLayout() {
     if (!linksGrid) return;
-    
+
     const categoryCount = categories.length;
 
     linksGrid.classList.remove('grid-single', 'grid-even', 'grid-odd', 'grid-custom');
@@ -1361,7 +1577,7 @@ function updateGridLayout() {
         linksGrid.style.setProperty('--links-grid-columns', safeColumns);
         return;
     }
-    
+
     if (categoryCount === 1) {
         linksGrid.classList.add('grid-single');
     } else if (categoryCount % 2 === 0) {
@@ -1380,35 +1596,35 @@ function initSettings() {
     const settingsFab = document.getElementById('settings-fab');
     const settingsOverlay = document.getElementById('settings-overlay');
     const settingsClose = document.getElementById('settings-close');
-    
+
     if (!settingsOverlay || !settingsClose) return;
-    
+
     // Open settings from both button and FAB
     const openSettings = () => {
         settingsOverlay.classList.add('active');
         populateSettingsUI();
     };
-    
+
     if (settingsBtn) {
         settingsBtn.addEventListener('click', openSettings);
     }
-    
+
     if (settingsFab) {
         settingsFab.addEventListener('click', openSettings);
     }
-    
+
     // Close settings
     settingsClose.addEventListener('click', () => {
         settingsOverlay.classList.remove('active');
     });
-    
+
     // Close on overlay click
     settingsOverlay.addEventListener('click', (e) => {
         if (e.target === settingsOverlay) {
             settingsOverlay.classList. remove('active');
         }
     });
-    
+
     // Close on Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -1417,44 +1633,44 @@ function initSettings() {
             }
         }
     });
-    
+
     // Tab switching
     document.querySelectorAll('.settings-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             const tabId = tab.dataset.tab;
-            
+
             document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
-            
+
             tab.classList.add('active');
             document.querySelector(`[data-panel="${tabId}"]`).classList.add('active');
-            
+
             if (tabId === 'categories') {
                 renderCategoriesSettings();
             } else if (tabId === 'links') {
                 renderLinksSettings();
-            } else if (tabId === 'social') {
-                renderSocialLinksSettings();
-            } else if (tabId === 'header') {
+            } else if (tabId === 'layout') {
                 renderHeaderSettings();
-            } else if (tabId === 'footer') {
                 renderFooterSettings();
+            } else if (tabId === 'widgets') {
+                renderGreetingSettings();
+                renderSocialLinksSettings();
                 renderQuotesSettings();
             } else if (tabId === 'help') {
                 // Help tab - content is static in HTML
             }
         });
     });
-    
+
     // Toggle button handlers
     document.querySelectorAll('.toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const setting = btn.dataset.setting;
             const value = btn.dataset.value;
-            
+
             saveSettings(setting, value);
             updateToggleStates();
-            
+
             if (setting === 'colorScheme') {
                 applyColorScheme(value);
             } else if (setting === 'theme') {
@@ -1477,8 +1693,18 @@ function initSettings() {
                 renderLinksGrid();
             } else if (setting === 'showKeyboardHints') {
                 updateKeyboardHints();
+            } else if (setting === 'keyboardHintsPosition') {
+                applyKeyboardHintsPosition();
+            } else if (setting === 'showCredits') {
+                applyCreditsVisibility();
+            } else if (setting === 'footerPinBottom') {
+                applyFooterPinBottom();
+            } else if (setting === 'leftSettings') {
+                applySettingsBtnPosition();
             } else if (setting === 'showSearchBar') {
                 applySearchVisibility();
+            } else if (setting === 'showCategories') {
+                applyCategoriesVisibility();
             } else if (setting === 'headerLeft' || setting === 'headerRight') {
                 updateHeader();
             } else if (setting === 'footerLeft' || setting === 'footerCenter' || setting === 'footerRight') {
@@ -1489,7 +1715,7 @@ function initSettings() {
             }
         });
     });
-    
+
     // Name input handler
     const nameInput = document.getElementById('setting-name');
     if (nameInput) {
@@ -1498,19 +1724,19 @@ function initSettings() {
             updateGreeting(new Date().getHours());
         });
     }
-    
+
     // Color scheme dropdown handler
     const colorSchemeSelect = document.getElementById('color-scheme-select');
     if (colorSchemeSelect) {
         colorSchemeSelect.addEventListener('change', (e) => {
             const scheme = e.target.value;
             applyColorScheme(scheme);
-            
+
             // Show/hide custom colors section and handle restrictions
             const customColorsSection = document.getElementById('custom-colors-section');
             const colorModeToggle = document.getElementById('color-mode-toggle');
             const themeToggle = document.querySelector('[data-setting="theme"]')?.closest('.setting-item');
-            
+
             if (scheme === 'custom') {
                 if (customColorsSection) customColorsSection.style.display = 'block';
                 // Force single color mode for custom theme
@@ -1558,7 +1784,7 @@ function initSettings() {
             }
         });
     }
-    
+
     // Preferred columns dropdown handler
     const preferredColumnsSelect = document.getElementById('setting-preferred-columns');
     if (preferredColumnsSelect) {
@@ -1567,7 +1793,15 @@ function initSettings() {
             updateGridLayout();
         });
     }
-    
+
+    const fontSelect = document.getElementById('setting-font');
+    if (fontSelect) {
+        fontSelect.addEventListener('change', (e) => {
+            saveSettings('font', e.target.value);
+            applyFont(e.target.value);
+        });
+    }
+
     // Custom color pickers - sync between color input and hex input
     const customColorInputs = [
         { color: 'custom-primary', hex: 'custom-primary-hex', prop: 'primary' },
@@ -1577,18 +1811,18 @@ function initSettings() {
         { color: 'custom-surface', hex: 'custom-surface-hex', prop: 'surface' },
         { color: 'custom-text', hex: 'custom-text-hex', prop: 'text' }
     ];
-    
+
     customColorInputs.forEach(({ color, hex, prop }) => {
         const colorInput = document.getElementById(color);
         const hexInput = document.getElementById(hex);
-        
+
         if (colorInput && hexInput) {
             // Color picker changes hex input
             colorInput.addEventListener('input', (e) => {
                 hexInput.value = e.target.value;
                 saveCustomColor(prop, e.target.value);
             });
-            
+
             // Hex input changes color picker
             hexInput.addEventListener('input', (e) => {
                 const value = e.target.value;
@@ -1599,51 +1833,68 @@ function initSettings() {
             });
         }
     });
-    
+
     // Weather location input handler
     const locationInput = document.getElementById('setting-weather-location');
     if (locationInput) {
         locationInput.addEventListener('input', (e) => {
             saveSettings('weatherLocation', e.target.value);
         });
-        
+
         // Update weather when user finishes typing (on blur)
         locationInput.addEventListener('blur', () => {
             updateWeather();
         });
     }
-    
+
     // OpenWeather API key input handler
     const apiKeyInput = document.getElementById('setting-weather-api-key');
     if (apiKeyInput) {
         apiKeyInput.addEventListener('input', (e) => {
             saveSettings('openWeatherApiKey', e.target.value.trim());
+            weatherApiState = settings.openWeatherApiKey ? 'pending' : 'none';
+            updateWeatherApiStatus();
         });
-        
+
         // Update weather when user finishes typing (on blur)
         apiKeyInput.addEventListener('blur', () => {
             updateWeather();
         });
     }
-    
+
+    // Greetings handlers
+    const greetingInputs = document.querySelectorAll('.setting-input[id^="greeting-"]');
+    greetingInputs.forEach(input => {
+        const id = input.id.replace('greeting-', '');
+        if (greetings[id]) {
+            input.value = greetings[id];
+        }
+
+        // save on input
+        input.addEventListener('input', (e) => {
+            greetings[id] = e.target.value;
+            saveSettings('greetings', greetings);
+        });
+    });
+
     // Background image upload handlers
     const backgroundImageBtn = document.getElementById('background-image-btn');
     const backgroundImageInput = document.getElementById('background-image-input');
     const removeBackgroundBtn = document.getElementById('remove-background-btn');
     const backgroundSizeSelect = document.getElementById('background-size-select');
-    
+
     if (backgroundImageBtn && backgroundImageInput) {
         backgroundImageBtn.addEventListener('click', () => {
             backgroundImageInput.click();
         });
-        
+
         backgroundImageInput.addEventListener('change', handleBackgroundImageUpload);
     }
-    
+
     if (removeBackgroundBtn) {
         removeBackgroundBtn.addEventListener('click', removeBackgroundImage);
     }
-    
+
     if (backgroundSizeSelect) {
         backgroundSizeSelect.addEventListener('change', (e) => {
             settings.backgroundSize = e.target.value;
@@ -1651,7 +1902,7 @@ function initSettings() {
             applyBackgroundImage();
         });
     }
-    
+
     // Search engine checkboxes
     document.querySelectorAll('#search-engine-options input').forEach(checkbox => {
         checkbox.addEventListener('change', () => {
@@ -1659,34 +1910,34 @@ function initSettings() {
             document.querySelectorAll('#search-engine-options input:checked').forEach(cb => {
                 enabledEngines.push(cb.dataset.engine);
             });
-            
+
             if (enabledEngines.length === 0) {
                 checkbox.checked = true;
                 return;
             }
-            
+
             saveSettings('enabledEngines', enabledEngines);
-            
+
             if (!enabledEngines.includes(currentEngine)) {
                 setSearchEngine(enabledEngines[0]);
             }
-            
+
             renderSearchEngines();
         });
     });
-    
+
     // Add category button
     const addCategoryBtn = document.getElementById('add-category-btn');
     if (addCategoryBtn) {
         addCategoryBtn.addEventListener('click', addCategory);
     }
-    
+
     // Add link button
     const addLinkBtn = document.getElementById('add-link-btn');
     if (addLinkBtn) {
         addLinkBtn.addEventListener('click', addLink);
     }
-    
+
     // Add quote button
     const addQuoteBtn = document.getElementById('add-quote-btn');
     if (addQuoteBtn) {
@@ -1695,6 +1946,8 @@ function initSettings() {
                 settings.quotes.push('"Your new quote here" - Author');
                 saveSettings('quotes', settings.quotes);
                 renderQuotesSettings();
+                const list = document.getElementById('quotes-list');
+                if (list) list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         });
     }
@@ -1710,7 +1963,18 @@ function initSettings() {
             renderLinksForCategory(e.target.value);
         });
     }
-    
+
+    // Locale events
+    const localeSelect = document.getElementById('language-select');
+    if (localeSelect) {
+        localeSelect.addEventListener('change', (e) => {
+            saveSettings('locale', e.target.value);
+            // Re-fetch weather
+            updateWeather();
+            updateForecast();
+        });
+    }
+
     updateToggleStates();
 }
 
@@ -1720,19 +1984,19 @@ function populateSettingsUI() {
     if (nameInput) {
         nameInput.value = settings.userName;
     }
-    
+
     // Populate color scheme dropdown
     const colorSchemeSelect = document.getElementById('color-scheme-select');
     if (colorSchemeSelect) {
         colorSchemeSelect.value = settings.colorScheme;
-        
+
         // Show/hide custom colors section
         const customColorsSection = document.getElementById('custom-colors-section');
         if (customColorsSection) {
             customColorsSection.style.display = settings.colorScheme === 'custom' ? 'block' : 'none';
         }
     }
-    
+
     // Populate custom color inputs
     if (settings.customColors) {
         const colorMap = {
@@ -1743,7 +2007,7 @@ function populateSettingsUI() {
             'custom-surface': settings.customColors.surface,
             'custom-text': settings.customColors.text
         };
-        
+
         Object.entries(colorMap).forEach(([id, value]) => {
             const colorInput = document.getElementById(id);
             const hexInput = document.getElementById(id + '-hex');
@@ -1751,30 +2015,52 @@ function populateSettingsUI() {
             if (hexInput) hexInput.value = value;
         });
     }
-    
+
     // Populate weather location input
     const locationInput = document.getElementById('setting-weather-location');
     if (locationInput) {
         locationInput.value = settings.weatherLocation;
     }
-    
+
     // Populate OpenWeather API key input
     const apiKeyInput = document.getElementById('setting-weather-api-key');
     if (apiKeyInput) {
         apiKeyInput.value = settings.openWeatherApiKey;
     }
-    
+
+    updateWeatherApiStatus();
+
     // Populate preferred columns dropdown
     const preferredColumnsSelect = document.getElementById('setting-preferred-columns');
     if (preferredColumnsSelect) {
         preferredColumnsSelect.value = settings.preferredColumns || 'auto';
     }
-    
+
+    const fontSelect = document.getElementById('setting-font');
+    if (fontSelect) {
+        fontSelect.innerHTML = Object.entries(fontFamilyMap)
+            .map(([id, family]) => {
+                const name = family.replace(/'/g, '');
+                return `<option value="${id}">${name}</option>`;
+            })
+            .join('');
+        fontSelect.value = settings.font;
+    }
+
+    // Locale selector
+    const localeSelect = document.getElementById('language-select');
+    if (localeSelect) {
+        localeSelect.innerHTML = Object.entries(LOCALES)
+            .map(([code, label]) => `<option value="${code}">${label}</option>`)
+            .join('');
+        localeSelect.value = settings.locale || defaultLocale || 'en';
+    }
+
     // Populate search engine checkboxes
     document.querySelectorAll('#search-engine-options input').forEach(checkbox => {
         checkbox.checked = settings.enabledEngines.includes(checkbox.dataset.engine);
     });
-    
+
     updateToggleStates();
 }
 
@@ -1782,7 +2068,7 @@ function updateToggleStates() {
     document.querySelectorAll('.toggle-btn').forEach(btn => {
         const setting = btn.dataset.setting;
         const value = btn.dataset.value;
-        
+
         // Handle boolean settings
         if (setting === 'backgroundBlur') {
             const isActive = settings[setting] === (value === 'true');
@@ -1814,9 +2100,9 @@ function parseIconInput(input) {
 function renderCategoriesSettings() {
     const container = document.getElementById('categories-list');
     const addBtn = document.getElementById('add-category-btn');
-    
+
     if (!container) return;
-    
+
     container.innerHTML = categories.map((category, index) => `
         <div class="category-item" data-id="${category.id}">
             <span class="drag-handle" draggable="true" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -1828,27 +2114,27 @@ function renderCategoriesSettings() {
             </button>
         </div>
     `).join('');
-    
+
     if (addBtn) {
         addBtn.disabled = categories.length >= 8;
     }
-    
+
     // Bind events
     container.querySelectorAll('.category-item').forEach(item => {
         const categoryId = item.dataset.id;
         const iconPreview = item.querySelector('.icon-preview i');
         const dragHandle = item.querySelector('.drag-handle');
-        
+
         // Drag and drop events on handle only
         if (dragHandle) {
             dragHandle.addEventListener('dragstart', handleCategoryDragStart);
             dragHandle.addEventListener('dragend', handleCategoryDragEnd);
         }
-        
+
         item.addEventListener('dragover', handleCategoryDragOver);
         item.addEventListener('drop', handleCategoryDrop);
         item.addEventListener('dragleave', handleCategoryDragLeave);
-        
+
         item.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => {
                 const field = input.dataset.field;
@@ -1863,12 +2149,12 @@ function renderCategoriesSettings() {
                             input.value = value;
                         }
                     }
-                    
+
                     category[field] = value;
                     saveCategories(categories);
                     renderLinksGrid();
                     updateLinkCategorySelect();
-                    
+
                     // Update icon preview
                     if (field === 'icon' && iconPreview) {
                         iconPreview.className = value || 'fa-solid fa-folder';
@@ -1876,7 +2162,7 @@ function renderCategoriesSettings() {
                 }
             });
         });
-        
+
         item.querySelector('.delete-btn').addEventListener('click', () => {
             if (categories.length > 1) {
                 deleteCategory(categoryId);
@@ -1887,7 +2173,7 @@ function renderCategoriesSettings() {
 
 function addCategory() {
     if (categories.length >= 8) return;
-    
+
     const newId = 'cat_' + Date.now();
     categories.push({
         id: newId,
@@ -1895,7 +2181,7 @@ function addCategory() {
         icon: 'fa-solid fa-folder'
     });
     links[newId] = [];
-    
+
     saveCategories(categories);
     saveLinks(links);
     renderCategoriesSettings();
@@ -1906,7 +2192,7 @@ function addCategory() {
 function deleteCategory(categoryId) {
     categories = categories.filter(c => c.id !== categoryId);
     delete links[categoryId];
-    
+
     saveCategories(categories);
     saveLinks(links);
     renderCategoriesSettings();
@@ -1929,12 +2215,12 @@ function handleCategoryDragOver(e) {
         e.preventDefault();
     }
     e.dataTransfer.dropEffect = 'move';
-    
+
     const target = e.target.closest('.category-item');
     if (target && target !== draggedCategoryElement) {
         target.classList.add('drag-over');
     }
-    
+
     return false;
 }
 
@@ -1942,28 +2228,28 @@ function handleCategoryDrop(e) {
     if (e.stopPropagation) {
         e.stopPropagation();
     }
-    
+
     const target = e.target.closest('.category-item');
     if (!target || !draggedCategoryElement || target === draggedCategoryElement) {
         return false;
     }
-    
+
     const draggedId = draggedCategoryElement.dataset.id;
     const targetId = target.dataset.id;
-    
+
     const draggedIndex = categories.findIndex(c => c.id === draggedId);
     const targetIndex = categories.findIndex(c => c.id === targetId);
-    
+
     if (draggedIndex !== -1 && targetIndex !== -1) {
         // Reorder categories array
         const [draggedCategory] = categories.splice(draggedIndex, 1);
         categories.splice(targetIndex, 0, draggedCategory);
-        
+
         saveCategories(categories);
         renderCategoriesSettings();
         renderLinksGrid();
     }
-    
+
     return false;
 }
 
@@ -1999,12 +2285,12 @@ function renderLinksSettings() {
 function updateLinkCategorySelect() {
     const select = document.getElementById('link-category-select');
     if (!select) return;
-    
+
     const currentValue = select.value;
-    
+
     select.innerHTML = '<option value="">-- Select a category --</option>' +
         categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-    
+
     if (categories.find(c => c.id === currentValue)) {
         select.value = currentValue;
     }
@@ -2013,17 +2299,17 @@ function updateLinkCategorySelect() {
 function renderLinksForCategory(categoryId) {
     const container = document.getElementById('links-list');
     const addBtn = document.getElementById('add-link-btn');
-    
+
     if (!container) return;
-    
+
     if (!categoryId) {
         container.innerHTML = '';
         if (addBtn) addBtn.disabled = true;
         return;
     }
-    
+
     const categoryLinks = links[categoryId] || [];
-    
+
     container.innerHTML = categoryLinks.map((link, index) => `
         <div class="link-item" data-index="${index}">
             <span class="drag-handle" draggable="true" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>
@@ -2036,27 +2322,27 @@ function renderLinksForCategory(categoryId) {
             </button>
         </div>
     `).join('');
-    
+
     if (addBtn) {
         addBtn.disabled = categoryLinks.length >= 10;
     }
-    
+
     // Bind events
     container.querySelectorAll('.link-item').forEach(item => {
         const index = parseInt(item.dataset.index);
         const iconPreview = item.querySelector('.icon-preview i');
         const dragHandle = item.querySelector('.drag-handle');
-        
+
         // Drag and drop events on handle only
         if (dragHandle) {
             dragHandle.addEventListener('dragstart', (e) => handleLinkDragStart(e, categoryId));
             dragHandle.addEventListener('dragend', handleLinkDragEnd);
         }
-        
+
         item.addEventListener('dragover', handleLinkDragOver);
         item.addEventListener('drop', (e) => handleLinkDrop(e, categoryId));
         item.addEventListener('dragleave', handleLinkDragLeave);
-        
+
         item.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => {
                 const field = input.dataset.field;
@@ -2070,11 +2356,11 @@ function renderLinksForCategory(categoryId) {
                             input.value = value;
                         }
                     }
-                    
+
                     links[categoryId][index][field] = value;
                     saveLinks(links);
                     renderLinksGrid();
-                    
+
                     // Update icon preview
                     if (field === 'icon' && iconPreview) {
                         iconPreview.className = value || 'fa-solid fa-link';
@@ -2082,7 +2368,7 @@ function renderLinksForCategory(categoryId) {
                 }
             });
         });
-        
+
         item.querySelector('.delete-btn').addEventListener('click', () => {
             deleteLink(categoryId, index);
         });
@@ -2093,19 +2379,19 @@ function addLink() {
     const select = document.getElementById('link-category-select');
     const categoryId = select ?  select.value : null;
     if (!categoryId) return;
-    
+
     if (!links[categoryId]) {
         links[categoryId] = [];
     }
-    
+
     if (links[categoryId].length >= 10) return;
-    
+
     links[categoryId].push({
         name: 'New Link',
         url: 'https://',
         icon: 'fa-solid fa-link'
     });
-    
+
     saveLinks(links);
     renderLinksForCategory(categoryId);
     renderLinksGrid();
@@ -2135,12 +2421,12 @@ function handleLinkDragOver(e) {
         e.preventDefault();
     }
     e.dataTransfer.dropEffect = 'move';
-    
+
     const target = e.target.closest('.link-item');
     if (target && target !== draggedLinkElement) {
         target.classList.add('drag-over');
     }
-    
+
     return false;
 }
 
@@ -2148,25 +2434,25 @@ function handleLinkDrop(e, categoryId) {
     if (e.stopPropagation) {
         e.stopPropagation();
     }
-    
+
     const target = e.target.closest('.link-item');
     if (!target || !draggedLinkElement || target === draggedLinkElement) {
         return false;
     }
-    
+
     const draggedIndex = parseInt(draggedLinkElement.dataset.index);
     const targetIndex = parseInt(target.dataset.index);
-    
+
     if (!isNaN(draggedIndex) && !isNaN(targetIndex) && links[categoryId]) {
         // Reorder links array
         const [draggedLink] = links[categoryId].splice(draggedIndex, 1);
         links[categoryId].splice(targetIndex, 0, draggedLink);
-        
+
         saveLinks(links);
         renderLinksForCategory(categoryId);
         renderLinksGrid();
     }
-    
+
     return false;
 }
 
@@ -2211,11 +2497,11 @@ function initializeSocialLinks() {
 function renderSocialLinksSettings() {
     const container = document.getElementById('social-links-list');
     if (!container) return;
-    
+
     if (!settings.socialLinks || settings.socialLinks.length === 0) {
         initializeSocialLinks();
     }
-    
+
     container.innerHTML = settings.socialLinks.map((social, index) => `
         <div class="social-link-item" data-index="${index}">
             <label class="social-checkbox">
@@ -2226,7 +2512,7 @@ function renderSocialLinksSettings() {
             <input type="url" class="social-url-input" value="${social.url || ''}" placeholder="https://..." data-index="${index}">
         </div>
     `).join('');
-    
+
     // Bind events
     container.querySelectorAll('.social-checkbox input').forEach(checkbox => {
         checkbox.addEventListener('change', (e) => {
@@ -2236,7 +2522,7 @@ function renderSocialLinksSettings() {
             updateFooter();
         });
     });
-    
+
     container.querySelectorAll('.social-url-input').forEach(input => {
         input.addEventListener('input', (e) => {
             const index = parseInt(e.target.dataset.index);
@@ -2248,21 +2534,37 @@ function renderSocialLinksSettings() {
 }
 
 // ========================================
+// Greeting Management
+// ========================================
+
+function renderGreetingSettings() {
+    const greetings = loadGreetings();
+    const timesOfDay = ['morning', 'afternoon', 'evening', 'night'];
+
+    timesOfDay.forEach(time => {
+        const input = document.getElementById(`greeting-${time}`);
+        if (input && greetings[time] !== undefined) {
+            input.value = greetings[time];
+        }
+    });
+}
+
+// ========================================
 // Quotes Management
 // ========================================
 
 function renderQuotesSettings() {
     const container = document.getElementById('quotes-list');
     const addBtn = document.getElementById('add-quote-btn');
-    
+
     if (!container) return;
-    
+
     container.innerHTML = settings.quotes.map((quote, index) => `
         <div class="quote-item" data-index="${index}">
-            <textarea 
-                class="quote-input" 
-                placeholder='"Your quote here" - Author' 
-                data-index="${index}" 
+            <textarea
+                class="quote-input"
+                placeholder='"Your quote here" - Author'
+                data-index="${index}"
                 rows="2"
             >${quote}</textarea>
             <button class="delete-btn" data-index="${index}" title="Delete Quote" ${settings.quotes.length <= 1 ? 'disabled' : ''}>
@@ -2270,11 +2572,11 @@ function renderQuotesSettings() {
             </button>
         </div>
     `).join('');
-    
+
     if (addBtn) {
         addBtn.disabled = settings.quotes.length >= 20;
     }
-    
+
     // Bind events
     container.querySelectorAll('.quote-input').forEach(input => {
         input.addEventListener('input', (e) => {
@@ -2284,7 +2586,7 @@ function renderQuotesSettings() {
             updateQuote();
         });
     });
-    
+
     container.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index);
@@ -2305,21 +2607,21 @@ function renderQuotesSettings() {
 function renderHeaderSettings() {
     const headerLeftSelect = document.getElementById('header-left-select');
     const headerRightSelect = document.getElementById('header-right-select');
-    
+
     // Set initial values
     if (headerLeftSelect) {
         headerLeftSelect.value = settings.headerLeft;
     }
-    
+
     if (headerRightSelect) {
         headerRightSelect.value = settings.headerRight;
     }
-    
+
     // Add change listeners with anti-duplicate logic
     if (headerLeftSelect) {
         headerLeftSelect.addEventListener('change', (e) => {
             const newValue = e.target.value;
-            
+
             // If selecting greeting or time-date, update the other selector
             if (newValue === 'greeting' && settings.headerRight === 'greeting') {
                 settings.headerRight = 'time-date';
@@ -2330,17 +2632,17 @@ function renderHeaderSettings() {
                 if (headerRightSelect) headerRightSelect.value = 'greeting';
                 saveSettings('headerRight', 'greeting');
             }
-            
+
             settings.headerLeft = newValue;
             saveSettings('headerLeft', newValue);
             updateHeader();
         });
     }
-    
+
     if (headerRightSelect) {
         headerRightSelect.addEventListener('change', (e) => {
             const newValue = e.target.value;
-            
+
             // If selecting greeting or time-date, update the other selector
             if (newValue === 'greeting' && settings.headerLeft === 'greeting') {
                 settings.headerLeft = 'time-date';
@@ -2351,7 +2653,7 @@ function renderHeaderSettings() {
                 if (headerLeftSelect) headerLeftSelect.value = 'greeting';
                 saveSettings('headerLeft', 'greeting');
             }
-            
+
             settings.headerRight = newValue;
             saveSettings('headerRight', newValue);
             updateHeader();
@@ -2368,7 +2670,7 @@ function renderFooterSettings() {
     const footerLeftSelect = document.getElementById('footer-left-select');
     const footerCenterSelect = document.getElementById('footer-center-select');
     const footerRightSelect = document.getElementById('footer-right-select');
-    
+
     if (footerLeftSelect) {
         footerLeftSelect.value = settings.footerLeft;
         footerLeftSelect.addEventListener('change', (e) => {
@@ -2376,7 +2678,7 @@ function renderFooterSettings() {
             updateFooter();
         });
     }
-    
+
     if (footerCenterSelect) {
         footerCenterSelect.value = settings.footerCenter;
         footerCenterSelect.addEventListener('change', (e) => {
@@ -2384,7 +2686,7 @@ function renderFooterSettings() {
             updateFooter();
         });
     }
-    
+
     if (footerRightSelect) {
         footerRightSelect.value = settings.footerRight;
         footerRightSelect.addEventListener('change', (e) => {
@@ -2392,6 +2694,7 @@ function renderFooterSettings() {
             updateFooter();
         });
     }
+
 }
 
 // ========================================
@@ -2401,17 +2704,17 @@ function renderFooterSettings() {
 function handleKeyboard(event) {
     const settingsOverlay = document.getElementById('settings-overlay');
     const isSettingsOpen = settingsOverlay && settingsOverlay.classList.contains('active');
-    
+
     if (event.key === '/' && document.activeElement !== searchInput && !isSettingsOpen) {
         event.preventDefault();
         if (searchInput) searchInput.focus();
     }
-    
+
     if (event.key === 'Escape' && searchInput) {
         searchInput.value = '';
         searchInput.blur();
     }
-    
+
     // Dynamic engine switching based on enabled engines
     if (document.activeElement !== searchInput && !isSettingsOpen) {
         const num = parseInt(event.key);
@@ -2438,23 +2741,23 @@ function initEventListeners() {
             }
         });
     }
-    
+
     document.addEventListener('keydown', handleKeyboard);
-    
+
     // Backup & Restore buttons
     const backupBtn = document.getElementById('backup-button');
     const restoreBtn = document.getElementById('restore-button');
     const restoreFileInput = document.getElementById('restore-file-input');
-    
+
     if (backupBtn) {
         backupBtn.addEventListener('click', exportSettings);
     }
-    
+
     if (restoreBtn && restoreFileInput) {
         restoreBtn.addEventListener('click', () => {
             restoreFileInput.click();
         });
-        
+
         restoreFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -2503,7 +2806,7 @@ function init() {
     weatherElement = document.getElementById('weather');
     quoteElement = document.getElementById('quote');
     linksGrid = document.getElementById('links-grid');
-    
+
     // Hide "New Window" option on Safari (it behaves the same as "New Tab")
     if (isSafari) {
         const newWindowBtn = document.getElementById('new-window-btn');
@@ -2515,15 +2818,15 @@ function init() {
             }
         }
     }
-    
+
     // Render dynamic content
     renderLinksGrid();
     renderSearchEngines();
-    
+
     // Update time immediately and every second
     updateDateTime();
     setInterval(updateDateTime, 1000);
-    
+
     // Add click handler to time element to toggle format
     if (timeElement) {
         timeElement.style.cursor = 'pointer';
@@ -2535,7 +2838,7 @@ function init() {
             updateToggleStates();
         });
     }
-    
+
     // Update weather
     updateWeather();
     setInterval(updateWeather, 600000);
@@ -2546,26 +2849,47 @@ function init() {
     // Update header and footer layout
     updateHeader();
     updateFooter();
-    
+
+    // Load haiku data — updateHaiku() is called after footer is built so haikuElement exists
+    fetch('./haiku.json')
+        .then(r => r.json())
+        .then(data => {
+            haikuData = data['haiku'] || [];
+            updateHaiku();
+        })
+        .catch(() => {});
+
+    // Quotes (from settings, no fetch needed)
+    updateQuote();
+
     // Apply background image
     applyBackgroundImage();
-    
+
     // Restore preferred search engine
     if (settings.enabledEngines.includes(settings.preferredEngine)) {
         setSearchEngine(settings.preferredEngine);
     } else if (settings.enabledEngines.length > 0) {
         setSearchEngine(settings.enabledEngines[0]);
     }
-    
+
+    // Set settings location
+    applySettingsBtnPosition();
+
+    // Set search visibility
+    applySearchVisibility();
+
+    // Set categories visibility
+    applyCategoriesVisibility();
+
     // Initialize event listeners
     initEventListeners();
-    
+
     // Initialize settings
     initSettings();
-    
+
     // Update background image UI
     updateBackgroundImageUI();
-    
+
     // Focus search input after a brief delay
     setTimeout(() => {
         if (searchInput) searchInput.focus();
@@ -2615,7 +2939,7 @@ function exportSettings() {
         categories: localStorage.getItem('categories'),
         links: localStorage.getItem('links')
     };
-    
+
     // Create and download file
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -2627,35 +2951,35 @@ function exportSettings() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
+
     // Show confirmation
     showNotification('Settings exported successfully!', 'success');
 }
 
 function importSettings(file) {
     const reader = new FileReader();
-    
+
     reader.onload = function(e) {
         try {
             const importData = JSON.parse(e.target.result);
-            
+
             // Validate data structure
             if (!importData.version || !importData.settings) {
                 throw new Error('Invalid backup file format');
             }
-            
+
             // Confirm before overwriting
             if (!confirm('This will replace all your current settings, categories, and links. Continue?')) {
                 return;
             }
-            
+
             // Import settings
             Object.entries(importData.settings).forEach(([key, value]) => {
                 if (value !== null && value !== undefined) {
                     localStorage.setItem(key, value);
                 }
             });
-            
+
             // Import categories and links
             if (importData.categories) {
                 localStorage.setItem('categories', importData.categories);
@@ -2663,18 +2987,18 @@ function importSettings(file) {
             if (importData.links) {
                 localStorage.setItem('links', importData.links);
             }
-            
+
             // Show success message and reload
             showNotification('Settings imported successfully! Reloading...', 'success');
             setTimeout(() => {
                 location.reload();
             }, 1500);
-            
+
         } catch (error) {
             showNotification('Error importing settings: ' + error.message, 'error');
         }
     };
-    
+
     reader.readAsText(file);
 }
 
@@ -2696,9 +3020,9 @@ function showNotification(message, type = 'info') {
         z-index: 10000;
         animation: slideIn 0.3s ease-out;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Remove after 3 seconds
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease-out';
@@ -2772,31 +3096,31 @@ uploadArea?.addEventListener('drop', (e) => {
 // Parse bookmark HTML file
 function parseBookmarkFile(file) {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
         try {
             const html = e.target.result;
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            
+
             // Parse bookmarks into categories
             parsedBookmarks = extractBookmarks(doc);
-            
+
             if (parsedBookmarks.categories.length === 0) {
                 showNotification('No bookmarks found in file', 'error');
                 return;
             }
-            
+
             // Show preview step
             renderBookmarkPreview();
             document.getElementById('import-step-upload').style.display = 'none';
             document.getElementById('import-step-preview').style.display = 'block';
-            
+
         } catch (error) {
             showNotification('Error parsing bookmark file: ' + error.message, 'error');
         }
     };
-    
+
     reader.readAsText(file);
 }
 
@@ -2805,26 +3129,26 @@ function extractBookmarks(doc) {
     const categories = [];
     const links = {};
     let categoryIdCounter = 1;
-    
+
     // Function to process a folder/category
     function processFolder(folderElement, parentName = '') {
         // Get folder name from the H3 that's a direct child of this DT
         const h3 = folderElement.querySelector(':scope > h3');
         const folderName = h3 ? h3.textContent.trim() : 'Bookmarks';
-        
+
         // Find the DL that contains the links/subfolders for this folder
         const dl = folderElement.querySelector(':scope > dl');
         if (!dl) return null;
-        
+
         const bookmarkLinks = [];
-        
+
         // Process all DT elements in this folder
         const dtElements = dl.querySelectorAll(':scope > dt');
         dtElements.forEach(dtElem => {
             // Check if it's a link or another folder
             const subH3 = dtElem.querySelector(':scope > h3');
             const anchor = dtElem.querySelector(':scope > a');
-            
+
             if (subH3) {
                 // It's a subfolder - process recursively
                 const subFolderData = processFolder(dtElem, folderName);
@@ -2836,7 +3160,7 @@ function extractBookmarks(doc) {
                 // It's a bookmark link
                 const url = anchor.getAttribute('href');
                 const name = anchor.textContent.trim();
-                
+
                 if (url && name && url.startsWith('http')) {
                     bookmarkLinks.push({
                         name: name,
@@ -2846,7 +3170,7 @@ function extractBookmarks(doc) {
                 }
             }
         });
-        
+
         // Only create category if it has links
         if (bookmarkLinks.length > 0) {
             const categoryId = 'imported-' + categoryIdCounter++;
@@ -2856,26 +3180,26 @@ function extractBookmarks(doc) {
                 icon: '',  // Leave icon blank for user to set
                 color: categoryColors[(categoryIdCounter - 2) % categoryColors.length]
             };
-            
+
             return { category, links: bookmarkLinks };
         }
-        
+
         return null;
     }
-    
+
     // Start parsing from the root
     // Try to find the main bookmark structure
     const rootDL = doc.querySelector('dl');
     if (!rootDL) {
         return { categories, links };
     }
-    
+
     // Process all top-level DT elements
     const topLevelDTs = rootDL.querySelectorAll(':scope > dt');
     topLevelDTs.forEach(dtElem => {
         const h3 = dtElem.querySelector(':scope > h3');
         const anchor = dtElem.querySelector(':scope > a');
-        
+
         if (h3) {
             // It's a folder
             const folderData = processFolder(dtElem);
@@ -2887,7 +3211,7 @@ function extractBookmarks(doc) {
             // It's a top-level bookmark (no folder)
             const url = anchor.getAttribute('href');
             const name = anchor.textContent.trim();
-            
+
             if (url && name && url.startsWith('http')) {
                 // Create "Other Bookmarks" category if not exists
                 let otherCategory = categories.find(c => c.name === 'Other Bookmarks');
@@ -2901,7 +3225,7 @@ function extractBookmarks(doc) {
                     categories.push(otherCategory);
                     links[otherCategory.id] = [];
                 }
-                
+
                 links[otherCategory.id].push({
                     name: name,
                     url: url,
@@ -2910,7 +3234,7 @@ function extractBookmarks(doc) {
             }
         }
     });
-    
+
     return { categories, links };
 }
 
@@ -2918,30 +3242,30 @@ function extractBookmarks(doc) {
 function renderBookmarkPreview() {
     const previewContainer = document.getElementById('import-preview');
     previewContainer.innerHTML = '';
-    
+
     // Calculate totals
     let totalBookmarks = 0;
     parsedBookmarks.categories.forEach(cat => {
         totalBookmarks += parsedBookmarks.links[cat.id]?.length || 0;
     });
-    
+
     document.getElementById('bookmark-count').textContent = totalBookmarks;
     document.getElementById('category-count').textContent = parsedBookmarks.categories.length;
-    
+
     // Render each category
     parsedBookmarks.categories.forEach(category => {
         const categoryLinks = parsedBookmarks.links[category.id] || [];
-        
+
         const categoryDiv = document.createElement('div');
         categoryDiv.className = 'import-category';
         categoryDiv.dataset.categoryId = category.id;
-        
+
         const headerDiv = document.createElement('div');
         headerDiv.className = 'import-category-header';
-        
+
         const checkboxLabel = document.createElement('label');
         checkboxLabel.className = 'import-category-checkbox';
-        
+
         const categoryCheckbox = document.createElement('input');
         categoryCheckbox.type = 'checkbox';
         categoryCheckbox.checked = true;
@@ -2951,36 +3275,36 @@ function renderBookmarkPreview() {
             const linkCheckboxes = categoryDiv.querySelectorAll('.import-link-checkbox input');
             linkCheckboxes.forEach(cb => cb.checked = e.target.checked);
         });
-        
+
         checkboxLabel.appendChild(categoryCheckbox);
-        
+
         const infoDiv = document.createElement('div');
         infoDiv.className = 'import-category-info';
-        
+
         const nameSpan = document.createElement('span');
         nameSpan.className = 'import-category-name';
         nameSpan.textContent = category.name;
-        
+
         const countSpan = document.createElement('span');
         countSpan.className = 'import-category-count';
         countSpan.textContent = `(${categoryLinks.length} ${categoryLinks.length === 1 ? 'link' : 'links'})`;
-        
+
         infoDiv.appendChild(nameSpan);
         infoDiv.appendChild(countSpan);
-        
+
         headerDiv.appendChild(checkboxLabel);
         headerDiv.appendChild(infoDiv);
-        
+
         const linksDiv = document.createElement('div');
         linksDiv.className = 'import-links';
-        
+
         categoryLinks.forEach((link, index) => {
             const linkDiv = document.createElement('div');
             linkDiv.className = 'import-link';
-            
+
             const linkCheckboxLabel = document.createElement('label');
             linkCheckboxLabel.className = 'import-link-checkbox';
-            
+
             const linkCheckbox = document.createElement('input');
             linkCheckbox.type = 'checkbox';
             linkCheckbox.checked = true;
@@ -2992,29 +3316,29 @@ function renderBookmarkPreview() {
                     .every(cb => cb.checked);
                 categoryCheckbox.checked = allChecked;
             });
-            
+
             linkCheckboxLabel.appendChild(linkCheckbox);
-            
+
             const linkInfo = document.createElement('div');
             linkInfo.className = 'import-link-info';
-            
+
             const linkName = document.createElement('div');
             linkName.className = 'import-link-name';
             linkName.textContent = link.name;
-            
+
             const linkUrl = document.createElement('div');
             linkUrl.className = 'import-link-url';
             linkUrl.textContent = link.url;
-            
+
             linkInfo.appendChild(linkName);
             linkInfo.appendChild(linkUrl);
-            
+
             linkDiv.appendChild(linkCheckboxLabel);
             linkDiv.appendChild(linkInfo);
-            
+
             linksDiv.appendChild(linkDiv);
         });
-        
+
         categoryDiv.appendChild(headerDiv);
         categoryDiv.appendChild(linksDiv);
         previewContainer.appendChild(categoryDiv);
@@ -3049,12 +3373,12 @@ document.getElementById('import-selected-btn')?.addEventListener('click', () => 
 function importSelectedBookmarks() {
     const selectedCategories = [];
     const selectedLinks = {};
-    
+
     // Collect selected bookmarks
     parsedBookmarks.categories.forEach(category => {
         const categoryDiv = document.querySelector(`[data-category-id="${category.id}"]`);
         const linkCheckboxes = categoryDiv.querySelectorAll('.import-link-checkbox input:checked');
-        
+
         if (linkCheckboxes.length > 0) {
             const categoryLinks = [];
             linkCheckboxes.forEach(checkbox => {
@@ -3062,31 +3386,31 @@ function importSelectedBookmarks() {
                 const link = parsedBookmarks.links[category.id][linkIndex];
                 categoryLinks.push(link);
             });
-            
+
             selectedCategories.push(category);
             selectedLinks[category.id] = categoryLinks;
         }
     });
-    
+
     if (selectedCategories.length === 0) {
         showNotification('No bookmarks selected', 'error');
         return;
     }
-    
+
     // Merge with existing categories and links
     const existingCategories = loadCategories();
     const existingLinks = loadLinks();
-    
+
     // Add new categories (avoid duplicates)
     selectedCategories.forEach(newCat => {
         // Check if category with same name exists
         const existingCat = existingCategories.find(c => c.name === newCat.name);
-        
+
         if (existingCat) {
             // Merge links into existing category
             const existingCatLinks = existingLinks[existingCat.id] || [];
             const newLinks = selectedLinks[newCat.id] || [];
-            
+
             // Add links that don't already exist (based on URL)
             newLinks.forEach(newLink => {
                 const isDuplicate = existingCatLinks.some(l => l.url === newLink.url);
@@ -3094,7 +3418,7 @@ function importSelectedBookmarks() {
                     existingCatLinks.push(newLink);
                 }
             });
-            
+
             existingLinks[existingCat.id] = existingCatLinks;
         } else {
             // Add as new category
@@ -3102,20 +3426,20 @@ function importSelectedBookmarks() {
             existingLinks[newCat.id] = selectedLinks[newCat.id];
         }
     });
-    
+
     // Save to localStorage
     saveCategories(existingCategories);
     saveLinks(existingLinks);
-    
+
     // Update global variables
     categories = existingCategories;
     links = existingLinks;
-    
+
     // Re-render UI
     renderLinksGrid();
     renderCategoriesSettings();
     renderLinksSettings();
-    
+
     // Close wizard and show success
     document.getElementById('import-wizard-overlay').classList.remove('active');
     showNotification(`Successfully imported ${selectedCategories.length} ${selectedCategories.length === 1 ? 'category' : 'categories'}!`, 'success');
