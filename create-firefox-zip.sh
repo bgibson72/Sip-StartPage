@@ -2,7 +2,7 @@
 # Create Firefox extension ZIP with Unix-style paths (forward slashes)
 # Required by Mozilla Add-ons validation
 
-VERSION="1.5.5"
+VERSION="1.6"
 SOURCE_DIR="$(pwd)"
 ZIP_NAME="sip-v${VERSION}-firefox.zip"
 ZIP_PATH="${SOURCE_DIR}/${ZIP_NAME}"

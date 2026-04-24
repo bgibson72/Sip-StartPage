@@ -266,7 +266,9 @@ function loadSettings() {
             background: '#1e1e2e',
             surface: '#313244',
             text: '#cdd6f4'
-        }
+        },
+        tabTitle: 'startpage',
+        favicon: null
     };
 
     return {
@@ -305,7 +307,9 @@ function loadSettings() {
         customColors: JSON.parse(localStorage.getItem('customColors') || JSON.stringify(defaults.customColors)),
         backgroundImage: localStorage.getItem('backgroundImage') || null,
         backgroundSize: localStorage.getItem('backgroundSize') || 'cover',
-        backgroundBlur: localStorage.getItem('backgroundBlur') === 'true'
+        backgroundBlur: localStorage.getItem('backgroundBlur') === 'true',
+        tabTitle: localStorage.getItem('tabTitle') ?? defaults.tabTitle,
+        favicon: localStorage.getItem('favicon') || null
     };
 }
 
@@ -767,6 +771,62 @@ function updateBackgroundImageUI() {
         removeBtn.style.display = 'none';
         sizeSection.style.display = 'none';
         if (blurSection) blurSection.style.display = 'none';
+    }
+}
+
+// ========================================
+// Tab Title & Favicon Functions
+// ========================================
+
+function applyTabTitle(title) {
+    document.title = title || 'startpage';
+}
+
+function applyFavicon(dataUrl) {
+    let link = document.querySelector("link[rel='icon']");
+    if (!link) {
+        link = document.createElement('link');
+        document.head.appendChild(link);
+    }
+    if (dataUrl) {
+        link.type = 'image/png';
+        link.href = dataUrl;
+    } else {
+        link.type = 'image/x-icon';
+        link.href = 'icons/favicon.ico';
+    }
+}
+
+function handleFaviconUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 1 * 1024 * 1024) {
+        showNotification('Favicon image should be less than 1MB', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        saveSettings('favicon', dataUrl);
+        applyFavicon(dataUrl);
+        updateFaviconResetBtn();
+    };
+    reader.readAsDataURL(file);
+}
+
+function resetFavicon() {
+    localStorage.removeItem('favicon');
+    settings.favicon = null;
+    applyFavicon(null);
+    updateFaviconResetBtn();
+}
+
+function updateFaviconResetBtn() {
+    const resetBtn = document.getElementById('reset-favicon-btn');
+    if (resetBtn) {
+        resetBtn.style.display = settings.favicon ? 'flex' : 'none';
     }
 }
 
@@ -1903,6 +1963,30 @@ function initSettings() {
         });
     }
 
+    // Tab title handler
+    const tabTitleInput = document.getElementById('setting-tab-title');
+    if (tabTitleInput) {
+        tabTitleInput.addEventListener('input', (e) => {
+            const title = e.target.value || 'startpage';
+            saveSettings('tabTitle', title);
+            applyTabTitle(title);
+        });
+    }
+
+    // Favicon handlers
+    const faviconBtn = document.getElementById('favicon-btn');
+    const faviconInput = document.getElementById('favicon-input');
+    const resetFaviconBtn = document.getElementById('reset-favicon-btn');
+
+    if (faviconBtn && faviconInput) {
+        faviconBtn.addEventListener('click', () => faviconInput.click());
+        faviconInput.addEventListener('change', handleFaviconUpload);
+    }
+
+    if (resetFaviconBtn) {
+        resetFaviconBtn.addEventListener('click', resetFavicon);
+    }
+
     // Search engine checkboxes
     document.querySelectorAll('#search-engine-options input').forEach(checkbox => {
         checkbox.addEventListener('change', () => {
@@ -2060,6 +2144,15 @@ function populateSettingsUI() {
     document.querySelectorAll('#search-engine-options input').forEach(checkbox => {
         checkbox.checked = settings.enabledEngines.includes(checkbox.dataset.engine);
     });
+
+    // Populate tab title input
+    const tabTitleInput = document.getElementById('setting-tab-title');
+    if (tabTitleInput) {
+        tabTitleInput.value = settings.tabTitle || '';
+    }
+
+    // Update favicon reset button visibility
+    updateFaviconResetBtn();
 
     updateToggleStates();
 }
@@ -2865,6 +2958,10 @@ function init() {
     // Apply background image
     applyBackgroundImage();
 
+    // Apply tab title and favicon
+    applyTabTitle(settings.tabTitle);
+    applyFavicon(settings.favicon);
+
     // Restore preferred search engine
     if (settings.enabledEngines.includes(settings.preferredEngine)) {
         setSearchEngine(settings.preferredEngine);
@@ -2934,7 +3031,9 @@ function exportSettings() {
             customColors: localStorage.getItem('customColors'),
             backgroundImage: localStorage.getItem('backgroundImage'),
             backgroundSize: localStorage.getItem('backgroundSize'),
-            backgroundBlur: localStorage.getItem('backgroundBlur')
+            backgroundBlur: localStorage.getItem('backgroundBlur'),
+            tabTitle: localStorage.getItem('tabTitle'),
+            favicon: localStorage.getItem('favicon')
         },
         categories: localStorage.getItem('categories'),
         links: localStorage.getItem('links')

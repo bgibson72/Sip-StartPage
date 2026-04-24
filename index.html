@@ -392,6 +392,36 @@
                                 <img id="background-preview" src="" alt="Background preview">
                             </div>
                         </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <i class="fa-solid fa-tag"></i>
+                                <div>
+                                    <span>Tab Title</span>
+                                    <p class="setting-description">The name shown in the browser tab.</p>
+                                </div>
+                            </div>
+                            <input type="text" id="setting-tab-title" class="setting-input" placeholder="startpage" maxlength="50">
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <i class="fa-solid fa-image"></i>
+                                <div>
+                                    <span>Favicon</span>
+                                    <p class="setting-description">Custom icon shown in the browser tab.</p>
+                                </div>
+                            </div>
+                            <div class="setting-actions">
+                                <button class="action-btn" id="favicon-btn">
+                                    <i class="fa-solid fa-file-image"></i> Choose Image
+                                </button>
+                                <input type="file" id="favicon-input" accept="image/*" style="display: none;">
+                                <button class="action-btn" id="reset-favicon-btn" style="display: none;">
+                                    <i class="fa-solid fa-rotate-left"></i> Reset
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Categories Tab -->
