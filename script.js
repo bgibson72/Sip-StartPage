@@ -366,6 +366,7 @@ let categories = loadCategories();
 let links = loadLinks();
 let currentEngine = settings.preferredEngine;
 let weatherApiState = settings.openWeatherApiKey ? 'pending' : 'none'; // 'none' | 'pending' | 'ok' | 'error'
+let geocodeCache = null; // { location, lat, lon }
 
 // ========================================
 // Theme Management
@@ -1066,30 +1067,45 @@ function applyKeyboardHintsPosition() {
 // Weather Function (OpenWeather API Integration)
 // ========================================
 
+async function geocodeLocation() {
+    const location = settings.weatherLocation;
+    const apiKey = settings.openWeatherApiKey;
+
+    // Return cached result if location hasn't changed
+    if (geocodeCache && geocodeCache.location === location) {
+        return geocodeCache;
+    }
+
+    const response = await fetch(
+        `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(location)}&limit=1&appid=${apiKey}`
+    );
+
+    if (!response.ok) throw new Error(`Geocoding API error: ${response.status}`);
+
+    const data = await response.json();
+    if (!data.length) throw new Error(`Location not found: ${location}`);
+
+    geocodeCache = { location, lat: data[0].lat, lon: data[0].lon };
+    return geocodeCache;
+}
+
 async function updateWeather() {
     if (!weatherElement) return;
 
-    // Check if API key is configured
     if (!settings.openWeatherApiKey || !settings.weatherLocation) {
-        // Fall back to mock weather data if no API key or location
         showMockWeather();
         return;
     }
 
-    let query = `q=${encodeURIComponent(settings.weatherLocation)}`;
-    // Optionally, use geolocation:
-    // if ('geolocation' in navigator) {
-    //     navigator.geolocation. getCurrentPosition(pos => {
-    //         query = `lat=${pos.coords. latitude}&lon=${pos.coords.longitude}`;
-    //         fetchWeather(query);
-    //     }, () => {
-    //         fetchWeather(query);
-    //     });
-    // } else {
-    //     fetchWeather(query);
-    // }
-    // For now, just use city name:
-    fetchWeather(query);
+    try {
+        const { lat, lon } = await geocodeLocation();
+        fetchWeather(`lat=${lat}&lon=${lon}`);
+    } catch (err) {
+        console.error('Geocoding error:', err);
+        weatherApiState = 'error';
+        updateWeatherApiStatus();
+        showMockWeather();
+    }
 }
 
 async function fetchWeather(query) {
@@ -1185,15 +1201,18 @@ function showMockWeather() {
 // ========================================
 
 async function updateForecast() {
-    // Check if API key is configured
     if (!settings.openWeatherApiKey || !settings.weatherLocation) {
-        // Fall back to mock forecast data if no API key or location
         showMockForecast();
         return;
     }
 
-    const query = `q=${encodeURIComponent(settings.weatherLocation)}`;
-    fetchForecast(query);
+    try {
+        const { lat, lon } = await geocodeLocation();
+        fetchForecast(`lat=${lat}&lon=${lon}`);
+    } catch (err) {
+        console.error('Geocoding error:', err);
+        showMockForecast();
+    }
 }
 
 async function fetchForecast(query) {
@@ -1899,6 +1918,7 @@ function initSettings() {
     if (locationInput) {
         locationInput.addEventListener('input', (e) => {
             saveSettings('weatherLocation', e.target.value);
+            geocodeCache = null; // Invalidate cache when location changes
         });
 
         // Update weather when user finishes typing (on blur)
