@@ -6,6 +6,9 @@
 /* Monospace fonts from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inconsolata:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
+/* Utility class to hide elements without inline styles */
+.hidden { display: none; }
+
 /* Nerd Font Symbols - for additional icons */
 @font-face {
     font-family: 'Symbols Nerd Font';
@@ -1091,12 +1094,14 @@ body {
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: all var(--transition-normal);
 }
 
 .settings-overlay.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .settings-modal {

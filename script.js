@@ -746,10 +746,10 @@ function updateBackgroundImageUI() {
 
     if (settings.backgroundImage) {
         previewImg.src = settings.backgroundImage;
-        previewSection.style.display = 'flex';
-        removeBtn.style.display = 'flex';
-        sizeSection.style.display = 'flex';
-        if (blurSection) blurSection.style.display = 'flex';
+        previewSection.classList.remove('hidden');
+        removeBtn.classList.remove('hidden');
+        sizeSection.classList.remove('hidden');
+        if (blurSection) blurSection.classList.remove('hidden');
 
         if (sizeSelect) {
             sizeSelect.value = settings.backgroundSize || 'cover';
@@ -767,10 +767,10 @@ function updateBackgroundImageUI() {
             });
         }
     } else {
-        previewSection.style.display = 'none';
-        removeBtn.style.display = 'none';
-        sizeSection.style.display = 'none';
-        if (blurSection) blurSection.style.display = 'none';
+        previewSection.classList.add('hidden');
+        removeBtn.classList.add('hidden');
+        sizeSection.classList.add('hidden');
+        if (blurSection) blurSection.classList.add('hidden');
     }
 }
 
@@ -826,7 +826,7 @@ function resetFavicon() {
 function updateFaviconResetBtn() {
     const resetBtn = document.getElementById('reset-favicon-btn');
     if (resetBtn) {
-        resetBtn.style.display = settings.favicon ? 'flex' : 'none';
+        resetBtn.classList.toggle('hidden', !settings.favicon);
     }
 }
 
@@ -1798,7 +1798,7 @@ function initSettings() {
             const themeToggle = document.querySelector('[data-setting="theme"]')?.closest('.setting-item');
 
             if (scheme === 'custom') {
-                if (customColorsSection) customColorsSection.style.display = 'block';
+                if (customColorsSection) customColorsSection.classList.remove('hidden');
                 // Force single color mode for custom theme
                 if (settings.colorMode !== 'single') {
                     saveSettings('colorMode', 'single');
@@ -1823,7 +1823,7 @@ function initSettings() {
                     });
                 }
             } else {
-                if (customColorsSection) customColorsSection.style.display = 'none';
+                if (customColorsSection) customColorsSection.classList.add('hidden');
                 // Re-enable color mode toggle
                 if (colorModeToggle) {
                     colorModeToggle.querySelectorAll('.toggle-btn').forEach(btn => {
@@ -2077,7 +2077,7 @@ function populateSettingsUI() {
         // Show/hide custom colors section
         const customColorsSection = document.getElementById('custom-colors-section');
         if (customColorsSection) {
-            customColorsSection.style.display = settings.colorScheme === 'custom' ? 'block' : 'none';
+            customColorsSection.classList.toggle('hidden', settings.colorScheme !== 'custom');
         }
     }
 
@@ -3141,8 +3141,8 @@ let parsedBookmarks = { categories: [], links: {} };
 document.getElementById('import-bookmarks-button')?.addEventListener('click', () => {
     document.getElementById('import-wizard-overlay').classList.add('active');
     // Reset to upload step
-    document.getElementById('import-step-upload').style.display = 'block';
-    document.getElementById('import-step-preview').style.display = 'none';
+    document.getElementById('import-step-upload').classList.remove('hidden');
+    document.getElementById('import-step-preview').classList.add('hidden');
 });
 
 // Close import wizard
@@ -3212,8 +3212,8 @@ function parseBookmarkFile(file) {
 
             // Show preview step
             renderBookmarkPreview();
-            document.getElementById('import-step-upload').style.display = 'none';
-            document.getElementById('import-step-preview').style.display = 'block';
+            document.getElementById('import-step-upload').classList.add('hidden');
+            document.getElementById('import-step-preview').classList.remove('hidden');
 
         } catch (error) {
             showNotification('Error parsing bookmark file: ' + error.message, 'error');
@@ -3459,8 +3459,8 @@ document.getElementById('deselect-all-btn')?.addEventListener('click', () => {
 
 // Back to upload
 document.getElementById('back-to-upload')?.addEventListener('click', () => {
-    document.getElementById('import-step-upload').style.display = 'block';
-    document.getElementById('import-step-preview').style.display = 'none';
+    document.getElementById('import-step-upload').classList.remove('hidden');
+    document.getElementById('import-step-preview').classList.add('hidden');
     document.getElementById('bookmark-file-input').value = '';
 });
 

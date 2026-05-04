@@ -185,7 +185,7 @@
                                 <button id="restore-button" class="action-btn">
                                     <i class="fa-solid fa-file-import"></i> Import
                                 </button>
-                                <input type="file" id="restore-file-input" accept=".json" style="display: none;">
+                                <input type="file" id="restore-file-input" accept=".json" class="hidden">
                             </div>
                         </div>
 
@@ -226,7 +226,7 @@
                             </select>
                         </div>
 
-                        <div class="setting-item" id="custom-colors-section" style="display: none;">
+                        <div class="setting-item hidden" id="custom-colors-section">
                             <div class="setting-label">
                                 <i class="fa-solid fa-droplet"></i>
                                 <span>Custom Colors</span>
@@ -352,14 +352,14 @@
                                 <button class="action-btn" id="background-image-btn">
                                     <i class="fa-solid fa-file-image"></i> Choose Image
                                 </button>
-                                <input type="file" id="background-image-input" accept="image/*" style="display: none;">
-                                <button class="action-btn" id="remove-background-btn" style="display: none;">
+                                <input type="file" id="background-image-input" accept="image/*" class="hidden">
+                                <button class="action-btn hidden" id="remove-background-btn">
                                     <i class="fa-solid fa-xmark"></i> Remove
                                 </button>
                             </div>
                         </div>
 
-                        <div class="setting-item" id="background-size-section" style="display: none;">
+                        <div class="setting-item hidden" id="background-size-section">
                             <div class="setting-label">
                                 <i class="fa-solid fa-expand"></i>
                                 <span>Background Size</span>
@@ -372,7 +372,7 @@
                             </select>
                         </div>
 
-                        <div class="setting-item" id="background-blur-section" style="display: none;">
+                        <div class="setting-item hidden" id="background-blur-section">
                             <div class="setting-label">
                                 <i class="fa-solid fa-droplet-slash"></i>
                                 <span>Background Blur</span>
@@ -383,7 +383,7 @@
                             </div>
                         </div>
 
-                        <div class="setting-item" id="background-preview-section" style="display: none;">
+                        <div class="setting-item hidden" id="background-preview-section">
                             <div class="setting-label">
                                 <i class="fa-solid fa-eye"></i>
                                 <span>Preview</span>
@@ -416,8 +416,8 @@
                                 <button class="action-btn" id="favicon-btn">
                                     <i class="fa-solid fa-file-image"></i> Choose Image
                                 </button>
-                                <input type="file" id="favicon-input" accept="image/*" style="display: none;">
-                                <button class="action-btn" id="reset-favicon-btn" style="display: none;">
+                                <input type="file" id="favicon-input" accept="image/*" class="hidden">
+                                <button class="action-btn hidden" id="reset-favicon-btn">
                                     <i class="fa-solid fa-rotate-left"></i> Reset
                                 </button>
                             </div>
@@ -785,14 +785,14 @@
                                 <button class="action-btn upload-btn" id="select-bookmark-file">
                                     <i class="fa-solid fa-folder-open"></i> Browse Files
                                 </button>
-                                <input type="file" id="bookmark-file-input" accept=".html,.htm" style="display: none;">
+                                <input type="file" id="bookmark-file-input" accept=".html,.htm" class="hidden">
                                 <p class="file-hint">Supported: Chrome, Firefox, Edge, Safari bookmark exports</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Step 2: Preview & Selection -->
-                    <div class="import-step" id="import-step-preview" style="display: none;">
+                    <div class="import-step hidden" id="import-step-preview">
                         <div class="import-step-content">
                             <div class="import-header">
                                 <h4>Select Bookmarks to Import</h4>
