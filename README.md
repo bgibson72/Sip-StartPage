@@ -258,7 +258,7 @@ Sip now includes 9 beautiful color schemes, each with both light and dark varian
 - Chrome/Firefox: `search` - To integrate with your browser's default search engine
 - Safari: None - No special permissions required
 
-**What We DON'T Do:**
+**What Sip DOESN'T Do:**
 - No data collection or analytics
 - No tracking or monitoring
 - No remote servers (except OpenWeather API if you configure it)
@@ -282,8 +282,6 @@ Need help? Have suggestions?
 - Read our detailed [README](https://github.com/bgibson72/start-page-v3)
 
 ---
-
-Made with ☕ and 💜 using Catppuccin themes
 
 ![Preview Image](sip_preview.png)
 
