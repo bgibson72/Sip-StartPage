@@ -503,7 +503,3 @@ This extension respects your privacy. See our [Privacy Policy](PRIVACY.md) for d
 ## 📄 License
 
 MIT License - feel free to modify and use as you wish!
-
----
-
-Made with ☕ and 💜 using Catppuccin
