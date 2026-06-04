@@ -348,7 +348,7 @@ Each screenshot demonstrates the glassmorphism effects, customizable categories,
 
 - **Firefox Add-ons** - [Available now](https://addons.mozilla.org/) (Desktop Firefox only)
 - **Chrome Web Store** - Coming soon!
-- **Safari Extension** - [Build & install instructions](SAFARI-QUICKSTART.md)
+- **Safari** - Use as a homepage (see below)
 
 Once installed, Sip will automatically replace your new tab page with a beautiful, customizable workspace.
 
@@ -366,15 +366,16 @@ Firefox on phones and tablets doesn't allow extensions to change the new tab pag
 
 All the beautiful themes, customization options, and touch-optimized interface work great when accessed as a website!
 
-### Safari Extension
+### Safari
 
-For Safari users, Sip can be built and installed as a native Safari Extension:
+Safari does not support third-party new tab page extensions, so Sip cannot replace the new tab page in Safari. Instead, you can use Sip as your homepage:
 
-1. Open the Xcode project: `open "Sip Safari/Sip Safari.xcodeproj"`
-2. Build and run the project (⌘ + R)
-3. Enable in Safari → Settings → Extensions
-4. See [SAFARI-QUICKSTART.md](SAFARI-QUICKSTART.md) for detailed instructions
-5. For App Store distribution, see [SAFARI-DISTRIBUTION.md](SAFARI-DISTRIBUTION.md)
+1. **Fork this repository** on GitHub
+2. **Enable GitHub Pages** in your fork's settings
+3. In Safari, go to **Settings → General** and set the **Homepage** to your GitHub Pages URL
+4. Set **New windows open with** and **New tabs open with** to **Homepage**
+
+Alternatively, open `index.html` locally and set the `file://` path as your homepage in Safari Settings.
 
 ---
 
