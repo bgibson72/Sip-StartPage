@@ -1039,6 +1039,13 @@ const fontFamilyMap = {
     'ibm-plex-mono': "'IBM Plex Mono'",
     'inconsolata': "'Inconsolata'",
     'space-mono': "'Space Mono'",
+    'inter': "'Inter'",
+    'source-sans': "'Source Sans 3'",
+    'roboto': "'Roboto', 'Roboto Flex'",
+    'manrope': "'Manrope'",
+    'overpass': "'Overpass'",
+    'space-grotesk': "'Space Grotesk'",
+    'ibm-plex-sans': "'IBM Plex Sans'",
 };
 
 function applyFont(font) {

@@ -6,6 +6,9 @@
 /* Monospace fonts from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inconsolata:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
+/* Sans fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Roboto:wght@400;500;600;700&family=Roboto+Flex:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Overpass:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
 /* Utility class to hide elements without inline styles */
 .hidden { display: none; }
 
@@ -855,6 +858,284 @@
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(0, 0, 0, 0.12);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   Everforest Theme
+   Medium contrast — sainnhe/everforest
+   ======================================== */
+
+/* Everforest Dark (medium) */
+[data-scheme="everforest"][data-theme="dark"] {
+    /* Base colors */
+    --crust: #232a2e;
+    --mantle: #2d353b;
+    --base: #343f44;
+    --surface0: #3d484d;
+    --surface1: #475258;
+    --surface2: #4f585e;
+    --overlay0: #7a8478;
+    --overlay1: #859289;
+    --overlay2: #9da9a0;
+    --text: #d3c6aa;
+    --subtext0: #859289;
+    --subtext1: #9da9a0;
+
+    /* Accent colors */
+    --rosewater: #e69875;
+    --flamingo: #e67e80;
+    --pink: #d699b6;
+    --mauve: #d699b6;
+    --red: #e67e80;
+    --maroon: #e67e80;
+    --peach: #e69875;
+    --yellow: #dbbc7f;
+    --green: #a7c080;
+    --teal: #83c092;
+    --sky: #7fbbb3;
+    --sapphire: #7fbbb3;
+    --blue: #7fbbb3;
+    --lavender: #d699b6;
+
+    /* Semantic colors */
+    --primary: #a7c080;
+    --secondary: #7fbbb3;
+    --accent: #83c092;
+
+    /* Glass effect */
+    --glass-bg: rgba(52, 63, 68, 0.6);
+    --glass-border: rgba(211, 198, 170, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Everforest Light (medium) */
+[data-scheme="everforest"][data-theme="light"] {
+    /* Base colors */
+    --crust: #efebd4;
+    --mantle: #f4f0d9;
+    --base: #fdf6e3;
+    --surface0: #e6e2cc;
+    --surface1: #e0dcc7;
+    --surface2: #bdc3af;
+    --overlay0: #a6b0a0;
+    --overlay1: #939f91;
+    --overlay2: #829181;
+    --text: #5c6a72;
+    --subtext0: #829181;
+    --subtext1: #708089;
+
+    /* Accent colors */
+    --rosewater: #f57d26;
+    --flamingo: #f85552;
+    --pink: #df69ba;
+    --mauve: #df69ba;
+    --red: #f85552;
+    --maroon: #e66868;
+    --peach: #f57d26;
+    --yellow: #dfa000;
+    --green: #8da101;
+    --teal: #35a77c;
+    --sky: #3a94c5;
+    --sapphire: #3a94c5;
+    --blue: #3a94c5;
+    --lavender: #df69ba;
+
+    /* Semantic colors */
+    --primary: #8da101;
+    --secondary: #3a94c5;
+    --accent: #35a77c;
+
+    /* Glass effect */
+    --glass-bg: rgba(253, 246, 227, 0.7);
+    --glass-border: rgba(92, 106, 114, 0.12);
+    --glass-shadow: 0 8px 32px rgba(92, 106, 114, 0.1);
+}
+
+/* ========================================
+   Rose Pine Theme
+   Main and Dawn — rosepinetheme.com
+   ======================================== */
+
+/* Rose Pine Dark (main) */
+[data-scheme="rose-pine"][data-theme="dark"] {
+    /* Base colors */
+    --crust: #191724;
+    --mantle: #1f1d2e;
+    --base: #1f1d2e;
+    --surface0: #26233a;
+    --surface1: #403d52;
+    --surface2: #524f67;
+    --overlay0: #6e6a86;
+    --overlay1: #908caa;
+    --overlay2: #908caa;
+    --text: #e0def4;
+    --subtext0: #6e6a86;
+    --subtext1: #908caa;
+
+    /* Accent colors */
+    --rosewater: #ebbcba;
+    --flamingo: #eb6f92;
+    --pink: #ebbcba;
+    --mauve: #c4a7e7;
+    --red: #eb6f92;
+    --maroon: #eb6f92;
+    --peach: #f6c177;
+    --yellow: #f6c177;
+    --green: #31748f;
+    --teal: #9ccfd8;
+    --sky: #9ccfd8;
+    --sapphire: #31748f;
+    --blue: #9ccfd8;
+    --lavender: #c4a7e7;
+
+    /* Semantic colors */
+    --primary: #c4a7e7;
+    --secondary: #eb6f92;
+    --accent: #9ccfd8;
+
+    /* Glass effect */
+    --glass-bg: rgba(31, 29, 46, 0.6);
+    --glass-border: rgba(224, 222, 244, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Rose Pine Light (Dawn) */
+[data-scheme="rose-pine"][data-theme="light"] {
+    /* Base colors */
+    --crust: #faf4ed;
+    --mantle: #f4ede8;
+    --base: #fffaf3;
+    --surface0: #f2e9e1;
+    --surface1: #dfdad9;
+    --surface2: #cecacd;
+    --overlay0: #9893a5;
+    --overlay1: #797593;
+    --overlay2: #797593;
+    --text: #464261;
+    --subtext0: #9893a5;
+    --subtext1: #797593;
+
+    /* Accent colors */
+    --rosewater: #d7827e;
+    --flamingo: #b4637a;
+    --pink: #d7827e;
+    --mauve: #907aa9;
+    --red: #b4637a;
+    --maroon: #b4637a;
+    --peach: #ea9d34;
+    --yellow: #ea9d34;
+    --green: #286983;
+    --teal: #56949f;
+    --sky: #56949f;
+    --sapphire: #286983;
+    --blue: #56949f;
+    --lavender: #907aa9;
+
+    /* Semantic colors */
+    --primary: #907aa9;
+    --secondary: #b4637a;
+    --accent: #56949f;
+
+    /* Glass effect */
+    --glass-bg: rgba(255, 250, 243, 0.7);
+    --glass-border: rgba(70, 66, 97, 0.12);
+    --glass-shadow: 0 8px 32px rgba(70, 66, 97, 0.1);
+}
+
+/* ========================================
+   Eldritch Theme
+   Dark: Cthulhu palette — eldritch-theme/eldritch
+   Light: derived (see comment below)
+   ======================================== */
+
+/* Eldritch Dark (Cthulhu) */
+[data-scheme="eldritch"][data-theme="dark"] {
+    /* Base colors */
+    --crust: #212337;
+    --mantle: #323449;
+    --base: #323449;
+    --surface0: #454759;
+    --surface1: #5b5c66;
+    --surface2: #5b5c66;
+    --overlay0: #7081d0;
+    --overlay1: #7081d0;
+    --overlay2: #a48cf2;
+    --text: #ebfafa;
+    --subtext0: #7081d0;
+    --subtext1: #ebfafa;
+
+    /* Accent colors */
+    --rosewater: #f7c67f;
+    --flamingo: #f265b5;
+    --pink: #f265b5;
+    --mauve: #a48cf2;
+    --red: #f16c75;
+    --maroon: #f16c75;
+    --peach: #f7c67f;
+    --yellow: #f1fc79;
+    --green: #37f499;
+    --teal: #04d1f9;
+    --sky: #04d1f9;
+    --sapphire: #04d1f9;
+    --blue: #04d1f9;
+    --lavender: #a48cf2;
+
+    /* Semantic colors */
+    --primary: #37f499;
+    --secondary: #a48cf2;
+    --accent: #04d1f9;
+
+    /* Glass effect */
+    --glass-bg: rgba(50, 52, 73, 0.6);
+    --glass-border: rgba(235, 250, 250, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Eldritch Light
+   Derived from the Cthulhu palette. Neutrals keep that palette's hue and
+   saturation; lightness is remapped from 17.25–37.84% into 96–84%. Text
+   reuses the dark background stops as ink. Accents keep Cthulhu hue and
+   saturation, with lightness lowered to 4.5:1 against the light page. */
+[data-scheme="eldritch"][data-theme="light"] {
+    /* Base colors */
+    --crust: #e7e7ee;
+    --mantle: #f2f3f7;
+    --base: #f2f3f7;
+    --surface0: #dddde4;
+    --surface1: #d4d4d9;
+    --surface2: #c9cacf;
+    --overlay0: #5b5c66;
+    --overlay1: #454759;
+    --overlay2: #323449;
+    --text: #212337;
+    --subtext0: #454759;
+    --subtext1: #323449;
+
+    /* Accent colors — Cthulhu hues, lightness reduced for the light page */
+    --rosewater: #945b09;
+    --flamingo: #c71178;
+    --pink: #c71178;
+    --mauve: #6f48ea;
+    --red: #cf1420;
+    --maroon: #cf1420;
+    --peach: #945b09;
+    --yellow: #656e02;
+    --green: #077842;
+    --teal: #027288;
+    --sky: #027288;
+    --sapphire: #027288;
+    --blue: #027288;
+    --lavender: #6f48ea;
+
+    /* Semantic colors */
+    --primary: #077842;
+    --secondary: #6f48ea;
+    --accent: #027288;
+
+    /* Glass effect */
+    --glass-bg: rgba(242, 243, 247, 0.7);
+    --glass-border: rgba(33, 35, 55, 0.12);
+    --glass-shadow: 0 8px 32px rgba(33, 35, 55, 0.1);
 }
 
 /* Custom color scheme - colors set dynamically via JavaScript */
